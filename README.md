@@ -60,11 +60,11 @@ git checkout -b feature/panha
 
 or from IDE:
 
-* Run `Application.java`
+- Run `Application.java`
 
 Then open:
 
-```
+```bash
 http://localhost:8080/login
 ```
 
@@ -74,12 +74,12 @@ http://localhost:8080/login
 
 Spring Security default behavior:
 
-* Username: **anything**
-* Password: **the generated password in console**
+- Username: **anything**
+- Password: **the generated password in console**
 
 Example:
 
-```
+```bash
 Using generated security password: xxxxxxxx
 ```
 
@@ -96,7 +96,7 @@ Later, this will be replaced by real users.
 
 2. Every member must work on **their own feature branch**, named after themselves:
 
-   ```
+   ```bash
    feature/<name>
    ```
 
@@ -107,25 +107,26 @@ Later, this will be replaced by real users.
 
 ### Contribution Guidelines
 
-* One task = one GitHub issue
-* Commit often with **clear, meaningful commit messages**
-* Push **only** your own branch:
+- One task = one GitHub issue
+- Commit often with **clear, meaningful commit messages**
+- Push **only** your own branch:
 
   ```bash
   git push origin feature/<name>
   ```
-* Open a **Pull Request → `main`**
-* Do **not** merge your own PR
-* Do **not** rebase `main`
-* Wait for leader review and merge
+
+- Open a **Pull Request → `main`**
+- Do **not** merge your own PR
+- Do **not** rebase `main`
+- Wait for leader review and merge
 
 ---
 
 ### Do Not Modify
 
-* The `main` branch
-* Project setup or configuration files unless explicitly required by your task
-* Security configuration unless you are assigned to the Security task
+- The `main` branch
+- Project setup or configuration files unless explicitly required by your task
+- Security configuration unless you are assigned to the Security task
 
 ---
 
