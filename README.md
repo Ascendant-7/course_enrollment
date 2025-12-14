@@ -27,10 +27,119 @@ Our project uses the **Spring Boot Framework** as the foundation.
   - Lombok
   - Springboot Dev Tools
 
-## Contribution Rules
+## Getting Started For Collaborators
 
-1. The branch `origin/main` is protected. No pushes allowed other than merging through PR requests.
+### 1. Clone the repo
 
-2. Every member is to work on their own branch named after themselves.
+```bash
+git clone https://github.com/Ascendant-7/course_enrollment.git
+cd course_enrollment
+```
 
-3. Every member is required to make PR requests to merge their work into the `origin/main` and only the leader has the rights to accept.
+---
+
+### 2. Create your own branch (mandatory)
+
+```bash
+git checkout -b feature/<your-name>
+```
+
+Example:
+
+```bash
+git checkout -b feature/panha
+```
+
+---
+
+### 3. Run the project
+
+```bash
+./mvnw spring-boot:run
+```
+
+or from IDE:
+
+* Run `Application.java`
+
+Then open:
+
+```
+http://localhost:8080/login
+```
+
+---
+
+### 4. Login credentials (important)
+
+Spring Security default behavior:
+
+* Username: **anything**
+* Password: **the generated password in console**
+
+Example:
+
+```
+Using generated security password: xxxxxxxx
+```
+
+Later, this will be replaced by real users.
+
+---
+
+## Collaboration Rules
+
+### Branching & Workflow
+
+1. The `main` branch is **protected**.
+   Direct pushes are **not allowed**. All changes must go through a Pull Request.
+
+2. Every member must work on **their own feature branch**, named after themselves:
+
+   ```
+   feature/<name>
+   ```
+
+3. All work must be merged into `main` **via Pull Request**.
+   Only the **team leader** is allowed to approve and merge PRs.
+
+---
+
+### Contribution Guidelines
+
+* One task = one GitHub issue
+* Commit often with **clear, meaningful commit messages**
+* Push **only** your own branch:
+
+  ```bash
+  git push origin feature/<name>
+  ```
+* Open a **Pull Request → `main`**
+* Do **not** merge your own PR
+* Do **not** rebase `main`
+* Wait for leader review and merge
+
+---
+
+### Do Not Modify
+
+* The `main` branch
+* Project setup or configuration files unless explicitly required by your task
+* Security configuration unless you are assigned to the Security task
+
+---
+
+### If Something Breaks
+
+Do **not** fix it silently.
+
+Instead:
+
+1. Comment on the related GitHub issue, or
+2. Ask in the group chat, or
+3. Open a **draft Pull Request** explaining the problem
+
+---
+
+That’s the process.
+Follow it strictly.
