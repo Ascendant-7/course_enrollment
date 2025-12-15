@@ -12,6 +12,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private final RoleBasedSuccessHandler roleBasedSuccessHandler;
+
+    public SecurityConfig(RoleBasedSuccessHandler roleBasedSuccessHandler) {
+        this.roleBasedSuccessHandler = roleBasedSuccessHandler;
+    }
+
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -20,24 +26,50 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // H2 console support (dev)
+            // Dev-only H2 console support
             .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
             .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/register", "/login", "/css/**", "/js/**", "/images/**", "/h2-console/**").permitAll()
-                .requestMatchers("/admin/**").hasRole("ADMIN") // requires ROLE_ADMIN
+                .requestMatchers("/login", "/css/**", "/js/**", "/images/**", "/h2-console/**").permitAll()
+
+                // Optional: restrict registration to admins (recommended in real apps)
+                .requestMatchers("/register").hasRole("ADMIN")
+
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/teacher/**").hasRole("TEACHER")
+                .requestMatchers("/student/**").hasRole("STUDENT")
+
                 .anyRequest().authenticated()
             )
 
             .formLogin(form -> form
                 .loginPage("/login")
-                .defaultSuccessUrl("/", true)
+                .successHandler(roleBasedSuccessHandler)
+                .failureUrl("/login?error")
                 .permitAll()
             )
+
             .logout(logout -> logout
+                .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID", "remember-me")
                 .permitAll()
+            )
+
+            // Session management
+            .sessionManagement(session -> session
+                .sessionFixation(sf -> sf.migrateSession())
+                .maximumSessions(1)
+                .maxSessionsPreventsLogin(false)
+            )
+
+            // Stretch: Remember-me
+            .rememberMe(rm -> rm
+                .key("change-me-rememberme-key")
+                .rememberMeParameter("remember-me")
+                .tokenValiditySeconds(7 * 24 * 60 * 60) // 7 days
             );
 
         return http.build();

@@ -22,6 +22,7 @@ public class AuthController {
         return "login";
     }
 
+    // If /register is ADMIN-only in SecurityConfig, only admins can reach this page
     @GetMapping("/register")
     public String registerForm(Model model) {
         model.addAttribute("form", new RegisterForm());
@@ -32,9 +33,7 @@ public class AuthController {
     public String registerSubmit(@Valid @ModelAttribute("form") RegisterForm form,
                                  BindingResult bindingResult,
                                  Model model) {
-        if (bindingResult.hasErrors()) {
-            return "register";
-        }
+        if (bindingResult.hasErrors()) return "register";
 
         try {
             registrationService.register(form);
