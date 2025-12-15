@@ -2,7 +2,9 @@ package edu.itc.enrollment_scheduling_system.config;
 
 import edu.itc.enrollment_scheduling_system.repository.UserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.*;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
@@ -19,15 +21,15 @@ public class DbUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         var user = users.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
         var authorities = user.getRoles().stream()
-                .map(r -> new SimpleGrantedAuthority(r.getName())) // expects ROLE_*
+                .map(role -> new SimpleGrantedAuthority(role.getName())) // expects ROLE_*
                 .collect(Collectors.toSet());
 
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getUsername())
-                .password(user.getPassword()) // BCrypt hash from DB
+                .password(user.getPassword()) // BCrypt hash stored in DB
                 .authorities(authorities)
                 .disabled(!user.isEnabled())
                 .build();
