@@ -6,8 +6,8 @@
 | -------------- | --------- | ----------- |
 | Ang Panha      | e20221707 | Team Leader |
 | Et Anchhy      | e20220608 | Member      |
-| Chhon Pheakdey | e2022xxxx | Member      |
-| Chi Savmoeng   | e2022xxxx | Member      |
+| Chhon Pheakdey | e20221063 | Member      |
+| Chi Savmoeng   | e20220753 | Member      |
 
 ## Project Requirements
 
