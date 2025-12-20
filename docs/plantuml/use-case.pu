@@ -1,0 +1,48 @@
+@startuml use-case
+
+left to right direction
+
+' Roles
+actor Guest as g
+actor Student as s
+actor Teacher as t
+actor "Registry Viewer" as rv
+actor Admin as a
+
+'Roles Extension
+s --|> g
+t --|> g
+s --|> rv
+t --|> rv
+a --|> s
+a --|> t
+
+'Use Cases
+rectangle "Course Enrollment and Classroom Scheduling System" {
+
+    usecase Authenticate as auth
+    usecase "Search Courses" as sc
+    usecase "View Courses" as vc
+    usecase "Register Courses" as rc
+    usecase "View Registrations" as vr
+    usecase "Drop Registrations" as dr
+    usecase "Manage Courses" as mc
+    usecase "Maintain System" as fs
+
+}
+
+'Roles to Use Cases
+g --> auth
+g --> sc
+g --> vc
+
+s --> rc
+s --> dr
+
+rv --> vr
+
+t --> mc
+
+a --> fs
+
+@enduml

@@ -8,6 +8,7 @@
 | Et Anchhy      | e20220608 | Member      |
 | Chhon Pheakdey | e20221063 | Member      |
 | Chi Savmoeng   | e20220753 | Member      |
+| Chhum Panha    | e20220815 | Member      |
 
 ## Project Requirements
 

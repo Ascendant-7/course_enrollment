@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class EnrollmentService {
@@ -30,8 +31,8 @@ public class EnrollmentService {
 
     @Transactional
     public String enrollStudent(User student, Long courseId) {
-        Course course = courseRepository.findById(courseId).orElse(null);
-        
+        Course course = courseRepository.findById(Objects.requireNonNull(courseId)).orElse(null);
+
         if (course == null) {
             return "Course not found";
         }
@@ -53,14 +54,14 @@ public class EnrollmentService {
 
     @Transactional
     public String dropCourse(User student, Long courseId) {
-        Course course = courseRepository.findById(courseId).orElse(null);
-        
+        Course course = courseRepository.findById(Objects.requireNonNull(courseId)).orElse(null);
+
         if (course == null) {
             return "Course not found";
         }
 
         Enrollment enrollment = enrollmentRepository.findByStudentAndCourse(student, course).orElse(null);
-        
+
         if (enrollment == null) {
             return "Not enrolled in this course";
         }
