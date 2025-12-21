@@ -1,4 +1,4 @@
-package edu.itc.enrollment_scheduling_system.config;
+package edu.itc.enrollment_scheduling_system.service;
 
 import edu.itc.enrollment_scheduling_system.repository.UserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

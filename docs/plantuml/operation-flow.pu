@@ -1,0 +1,13 @@
+@startuml operation-flow
+' this diagram explains the flow of operation.
+
+actor User
+
+User -> Controller : requests
+Controller -> Service : handles
+Service -> Repository : queries
+Repository -> Service : results
+Service -> Controller : responds
+Controller  -> View : renders
+
+@enduml

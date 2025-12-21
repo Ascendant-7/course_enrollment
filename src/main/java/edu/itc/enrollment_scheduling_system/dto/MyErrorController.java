@@ -1,4 +1,4 @@
-package edu.itc.enrollment_scheduling_system.web.dto;
+package edu.itc.enrollment_scheduling_system.dto;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;

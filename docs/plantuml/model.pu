@@ -1,0 +1,19 @@
+@startuml model
+
+class User {}
+class Role {}
+class Course {}
+class Registration {}
+class Classroom {}
+class Schedule {}
+
+User "1" -- "*" Role : has
+
+User "1" -- "*" Registration : registers
+Course "1" -- "*" Registration : includes
+
+Course "1" -- "*" Classroom : held in
+
+Classroom "1" -- "*" Schedule : hosts
+
+@enduml
