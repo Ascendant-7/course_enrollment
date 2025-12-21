@@ -1,5 +1,4 @@
-package edu.itc.enrollment_scheduling_system.web;
-
+package edu.itc.enrollment_scheduling_system.controller;
 import edu.itc.enrollment_scheduling_system.model.Course;
 import edu.itc.enrollment_scheduling_system.model.Enrollment;
 import edu.itc.enrollment_scheduling_system.model.User;

@@ -4,7 +4,7 @@ import edu.itc.enrollment_scheduling_system.model.Role;
 import edu.itc.enrollment_scheduling_system.model.User;
 import edu.itc.enrollment_scheduling_system.repository.RoleRepository;
 import edu.itc.enrollment_scheduling_system.repository.UserRepository;
-import edu.itc.enrollment_scheduling_system.web.dto.RegisterForm;
+import edu.itc.enrollment_scheduling_system.dto.RegisterForm;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
