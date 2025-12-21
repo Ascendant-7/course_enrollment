@@ -1,6 +1,7 @@
 package edu.itc.enrollment_scheduling_system.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,18 +14,29 @@ public class Course {
     private Long id;
 
     @Column(nullable = false)
+    @NotBlank(message = "Course code is required")
+    @Size(max = 10, message = "Course code must not exceed 10 characters")
     private String code;
 
     @Column(nullable = false)
+    @NotBlank(message = "Course name is required")
+    @Size(max = 100, message = "Course name must not exceed 100 characters")
     private String name;
 
     @Column(length = 1000)
+    @Size(max = 1000, message = "Description must not exceed 1000 characters")
     private String description;
 
     @Column(nullable = false)
+    @NotNull(message = "Credits is required")
+    @Min(value = 1, message = "Credits must be at least 1")
+    @Max(value = 10, message = "Credits must not exceed 10")
     private Integer credits;
 
     @Column(nullable = false)
+    @NotNull(message = "Capacity is required")
+    @Min(value = 1, message = "Capacity must be at least 1")
+    @Max(value = 100, message = "Capacity must not exceed 100")
     private Integer capacity;
 
     @ManyToOne
