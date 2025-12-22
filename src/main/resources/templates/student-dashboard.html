@@ -119,7 +119,10 @@
         </div>
 
         <div class="logout-section">
-            <a th:href="@{/logout}" class="logout-btn">Logout</a>
+            <!-- Replace the GET link with POST logout -->
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
         </div>
     </div>
 </body>

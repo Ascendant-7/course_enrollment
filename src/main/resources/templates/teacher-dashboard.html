@@ -3,6 +3,10 @@
 <head><meta charset="UTF-8"><title>Teacher</title></head>
 <body>
 <h1>Teacher Dashboard</h1>
-<p><a th:href="@{/logout}">Logout</a></p>
+
+<form th:action="@{/logout}" method="post">
+  <button type="submit">Logout</button>
+</form>
+
 </body>
 </html>

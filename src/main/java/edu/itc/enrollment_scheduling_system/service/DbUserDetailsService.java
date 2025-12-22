@@ -24,12 +24,12 @@ public class DbUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
         var authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName())) // expects ROLE_*
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toSet());
 
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getUsername())
-                .password(user.getPassword()) // BCrypt hash stored in DB
+                .password(user.getPassword())
                 .authorities(authorities)
                 .disabled(!user.isEnabled())
                 .build();
