@@ -19,7 +19,7 @@ This week focused on completing the first CRUD milestone, refactoring security c
 - **Status**: Done
 - **Description**: Assigned tasks for CRUD milestone #1, security refactorations, and error handling. Helped out with small issues within the team.
 - **Proof**: Weekly Report 2 summary and task table
-- **Reflection**: Task distribution was effective, but clearer boundaries between security refactors and feature development would reduce overlap.
+- **Reflection**: Task distribution was hard. Need more insight.
 
 ### Task B: Repository Oversight & Integration Review
 
@@ -27,7 +27,7 @@ This week focused on completing the first CRUD milestone, refactoring security c
 - **Description**: Reviewed commits related to CRUD implementation, security refactors, and error handling to ensure compatibility with the existing project structure and configuration.
 - **Proof**: GitHub repository activity and merged commits
   [Ascendant-7/course_enrollment](https://github.com/Ascendant-7/course_enrollment)
-- **Reflection**: Integration went smoothly due to early project structure decisions made in Week 1.
+- **Reflection**: CRUD milestone isn't completed yet but we'll report what we can.
 
 ### Task C: Project Structure & Path Consistency Validation
 
