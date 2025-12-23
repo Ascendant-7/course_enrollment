@@ -360,12 +360,6 @@
             </div>
             <div class="course-grid" th:if="${!courses.isEmpty()}">
                 <div class="course-card" th:each="course : ${courses}">
-                    <!-- Enrolled Badge -->
-                    <div th:if="${enrollments.stream().anyMatch(e -> e.course.id == course.id && e.status.name() == 'ACTIVE')}" 
-                         class="enrolled-badge">
-                        ✓ Enrolled
-                    </div>
-
                     <div class="course-code" th:text="${course.code}"></div>
                     <div class="course-name" th:text="${course.name}"></div>
                     <div class="course-description" th:text="${course.description}"></div>
@@ -388,9 +382,7 @@
                     </div>
 
                     <!-- Enrollment Button -->
-                    <form th:if="${!enrollments.stream().anyMatch(e -> e.course.id == course.id && e.status.name() == 'ACTIVE')}" 
-                          th:action="@{/student/enroll/{id}(id=${course.id})}" 
-                          method="post">
+                    <form th:action="@{/student/enroll/{id}(id=${course.id})}" method="post">
                         <button type="submit" 
                                 class="btn btn-success" 
                                 style="width: 100%;"
