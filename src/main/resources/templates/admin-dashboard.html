@@ -4,6 +4,8 @@
 <body>
 <h1>Admin Dashboard</h1>
 <p><a th:href="@{/register}">Add User (Register)</a></p>
-<p><a th:href="@{/logout}">Logout</a></p>
+<form th:action="@{/logout}" method="post">
+  <button type="submit">Logout</button>
+</form>
 </body>
 </html>
