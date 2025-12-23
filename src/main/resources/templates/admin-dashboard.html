@@ -1,12 +1,83 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head><meta charset="UTF-8"><title>Admin</title></head>
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 80px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .menu a {
+            display: block;
+            padding: 12px;
+            margin-bottom: 10px;
+            text-decoration: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .menu a:hover {
+            background-color: #0056b3;
+        }
+
+        .logout {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .logout button {
+            padding: 10px 20px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .logout button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+
 <body>
-<h1>Admin Dashboard</h1>
-<p><a th:href="@{/admin/courses}">Manage Courses</a></p>
-<p><a th:href="@{/register}">Add User (Register)</a></p>
-<form th:action="@{/logout}" method="post">
-  <button type="submit">Logout</button>
-</form>
+<div class="container">
+
+    <h1>Admin Dashboard</h1>
+
+    <div class="menu">
+        <a th:href="@{/admin/courses}">Manage Courses</a>
+        <a th:href="@{/register}">Add User (Register)</a>
+    </div>
+
+    <div class="logout">
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+
+</div>
 </body>
 </html>

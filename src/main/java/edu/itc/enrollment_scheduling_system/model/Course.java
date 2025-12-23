@@ -2,86 +2,109 @@ package edu.itc.enrollment_scheduling_system.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "courses")
+@Table(
+    name = "courses",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = "code")
+    }
+)
 public class Course {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    // Course code (e.g., CS101)
     @NotBlank(message = "Course code is required")
-    @Size(max = 10, message = "Course code must not exceed 10 characters")
+    @Size(min = 3, max = 10, message = "Course code must be 3–10 characters")
+    @Column(nullable = false, unique = true)
     private String code;
 
-    @Column(nullable = false)
+    // Course name
     @NotBlank(message = "Course name is required")
     @Size(max = 100, message = "Course name must not exceed 100 characters")
+    @Column(nullable = false)
     private String name;
 
-    @Column(length = 1000)
-    @Size(max = 1000, message = "Description must not exceed 1000 characters")
+    // Description (optional)
+    @Size(max = 255, message = "Description must not exceed 255 characters")
     private String description;
 
-    @Column(nullable = false)
-    @NotNull(message = "Credits is required")
-    @Min(value = 1, message = "Credits must be at least 1")
-    @Max(value = 10, message = "Credits must not exceed 10")
-    private Integer credits;
-
-    @Column(nullable = false)
+    // Capacity
     @NotNull(message = "Capacity is required")
     @Min(value = 1, message = "Capacity must be at least 1")
-    @Max(value = 100, message = "Capacity must not exceed 100")
+    @Column(nullable = false)
     private Integer capacity;
 
-    @ManyToOne
-    @JoinColumn(name = "teacher_id")
-    private User teacher;
-
-    @OneToMany(mappedBy = "course")
+    // Relationship
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Enrollment> enrollments = new HashSet<>();
 
+    // ==========================
+    // Constructors
+    // ==========================
     public Course() {}
 
-    public Course(String code, String name, String description, Integer credits, Integer capacity) {
+    // ==========================
+    // Getters & Setters
+    // ==========================
+    public Long getId() {
+        return id;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
         this.code = code;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
         this.description = description;
-        this.credits = credits;
+    }
+
+    public Integer getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(Integer capacity) {
         this.capacity = capacity;
     }
 
-    // Getters and setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Set<Enrollment> getEnrollments() {
+        return enrollments;
+    }
 
-    public String getCode() { return code; }
-    public void setCode(String code) { this.code = code; }
+    public void setEnrollments(Set<Enrollment> enrollments) {
+        this.enrollments = enrollments;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-
-    public Integer getCredits() { return credits; }
-    public void setCredits(Integer credits) { this.credits = credits; }
-
-    public Integer getCapacity() { return capacity; }
-    public void setCapacity(Integer capacity) { this.capacity = capacity; }
-
-    public User getTeacher() { return teacher; }
-    public void setTeacher(User teacher) { this.teacher = teacher; }
-
-    public Set<Enrollment> getEnrollments() { return enrollments; }
-    public void setEnrollments(Set<Enrollment> enrollments) { this.enrollments = enrollments; }
-
+    // ==========================
+    // Business Logic
+    // ==========================
+    @Transient
     public Integer getAvailableSeats() {
-        return capacity - enrollments.size();
+        if (capacity == null || enrollments == null) {
+            return 0;
+        }
+        return Math.max(0, capacity - enrollments.size());
     }
 }
