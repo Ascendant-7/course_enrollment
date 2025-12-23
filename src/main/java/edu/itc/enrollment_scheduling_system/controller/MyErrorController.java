@@ -27,7 +27,7 @@ public class MyErrorController implements ErrorController {
         return "error/500"; 
     }
 
-    // បន្ថែមសម្រាប់តេស្តមើល UI ផ្ទាល់
+    
     @RequestMapping("/test403")
     public String test403() {
         return "error/403"; 
