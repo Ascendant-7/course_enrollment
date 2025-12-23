@@ -1,48 +1,110 @@
-@startuml use-case
+@startuml usecase
 
 left to right direction
 
-' Roles
-actor Guest as g
-actor Student as s
-actor Teacher as t
-actor "Registry Viewer" as rv
-actor Admin as a
+actor Guest
+actor Student
+actor Teacher
+actor Admin
 
-'Roles Extension
-s --|> g
-t --|> g
-s --|> rv
-t --|> rv
-a --|> s
-a --|> t
+rectangle "Enrollment and Scheduling System" {
 
-'Use Cases
-rectangle "Course Enrollment and Classroom Scheduling System" {
+    usecase "authenticate"
 
-    usecase Authenticate as auth
-    usecase "Search Courses" as sc
-    usecase "View Courses" as vc
-    usecase "Register Courses" as rc
-    usecase "View Registrations" as vr
-    usecase "Drop Registrations" as dr
-    usecase "Manage Courses" as mc
-    usecase "Maintain System" as fs
+    rectangle "Course" {
+        usecase "search" as course_search
+        usecase "view" as course_view
+        usecase "manage" as course_manage
+    }
+    
+    rectangle "Enrollment" {
+        usecase "enroll" as enrollment_enroll /'meaning to enroll'/
+        usecase "search" as enrollment_search
+        usecase "view" as enrollment_view
+        usecase "drop" as enrollment_drop
+    }
+    
+    rectangle "Classroom" {
+        usecase "search" as classroom_search
+        usecase "view" as classroom_view
+        usecase "administrate" as classroom_administrate
 
+        rectangle "Schedule" {
+            usecase "search" as schedule_search
+            usecase "view" as schedule_view
+            usecase "administrate" as schedule_administrate
+        }
+    }
 }
 
-'Roles to Use Cases
-g --> auth
-g --> sc
-g --> vc
+' ====================
+Guest --> course_search
+Guest -> course_view
+Guest -> authenticate
+' ====================
+Student --> course_search
+Student -> course_view
 
-s --> rc
-s --> dr
+Student -> enrollment_enroll
+Student -> enrollment_search
+Student -> enrollment_view
+Student -> enrollment_drop
 
-rv --> vr
+Student -> classroom_search
+Student -> classroom_view
 
-t --> mc
+Student -> schedule_search
+Student -> schedule_view
+' ====================
+Teacher --> course_search
+Teacher -> course_view
 
-a --> fs
+Teacher -> enrollment_search
+Teacher -> enrollment_view
+
+Teacher -> classroom_search
+Teacher -> classroom_view
+Teacher -> classroom_administrate
+
+Teacher -> schedule_search
+Teacher -> schedule_view
+Teacher -> schedule_administrate
+' ====================
+Admin --> course_search
+Admin -> course_view
+
+Admin -> enrollment_search
+Admin -> enrollment_view
+
+Admin -> classroom_search
+Admin -> classroom_view
+' ====================
+
+
+note right of "Course"
+    Permissions:
+    - anyone can search/view courses
+end note
+
+note right of "Enrollment"
+    Permissions:
+    - students can only search/view/drop their personal enrollments
+    - teachers can only search/view their course enrollments
+    - admins can search/view/drop all enrollments
+end note
+
+note right of "Classroom"
+    Permissions:
+    - students can only search/view their classroom
+    - teachers can only search/view/administrate their classroom
+    - admins can search/view all classrooms
+end note
+
+note right of "Schedule"
+    Permissions:
+    - students can only search/view their schedule
+    - teachers can only search/view/administrate their schedule
+    - admins can search/view all schedules
+end note
 
 @enduml

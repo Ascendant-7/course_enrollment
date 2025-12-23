@@ -1,4 +1,4 @@
-package edu.itc.enrollment_scheduling_system.web.dto;
+package edu.itc.enrollment_scheduling_system.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
