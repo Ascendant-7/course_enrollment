@@ -16,10 +16,13 @@ public class User {
     private String username;
 
     @Column(nullable = false)
-    private String password; // store BCrypt hash
+    private String password;
 
     @Column(nullable = false)
     private boolean enabled = true;
+
+    @Column(nullable = false)
+    private boolean approved = false; // NEW: Admin approval flag
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -41,6 +44,9 @@ public class User {
 
     public boolean isEnabled() { return enabled; }
     public void setEnabled(boolean enabled) { this.enabled = enabled; }
+
+    public boolean isApproved() { return approved; }
+    public void setApproved(boolean approved) { this.approved = approved; }
 
     public Set<Role> getRoles() { return roles; }
     public void setRoles(Set<Role> roles) { this.roles = roles; }

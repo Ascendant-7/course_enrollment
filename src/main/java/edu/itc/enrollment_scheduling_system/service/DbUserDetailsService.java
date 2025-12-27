@@ -31,7 +31,8 @@ public class DbUserDetailsService implements UserDetailsService {
                 .withUsername(user.getUsername())
                 .password(user.getPassword())
                 .authorities(authorities)
-                .disabled(!user.isEnabled())
+                .disabled(!user.isEnabled() || !user.isApproved()) // Check both enabled and approved
+                .accountLocked(!user.isApproved()) // Lock account if not approved
                 .build();
     }
 }

@@ -120,7 +120,6 @@
       box-shadow: 0 0 0 4px var(--ring);
     }
 
-    /* Fix: remember-me alignment */
     .row{
       display:flex;
       align-items:center;
@@ -141,7 +140,7 @@
     .check input[type="checkbox"]{
       width: 18px;
       height: 18px;
-      margin: 0;              /* key for alignment */
+      margin: 0;
       flex: 0 0 18px;
       accent-color: #667eea;
     }
@@ -149,7 +148,7 @@
       font-size: 13px;
       color: var(--muted);
       position: relative;
-      top: 0;                 /* ensure no baseline drift */
+      top: 0;
     }
 
     .btn{
@@ -174,6 +173,7 @@
       margin-top: 12px;
       color: rgba(255,255,255,.92);
       font-size: 14px;
+      line-height: 1.5;
     }
     .footer a{
       color: #ffffff;
@@ -190,7 +190,7 @@
 <body>
   <div class="page">
     <div class="brand">
-      <h1>Welcome back</h1>
+      <h1>Welcome</h1>
       <p>Sign in to continue to the Enrollment Scheduling System</p>
     </div>
 
@@ -219,21 +219,13 @@
             <input class="input" id="password" name="password" type="password" autocomplete="current-password" required />
           </div>
 
-          <div class="row">
-            <label class="check" for="remember-me">
-              <input id="remember-me" type="checkbox" name="remember-me" />
-              <span>Remember me</span>
-            </label>
-          </div>
-
           <button class="btn" type="submit">Sign in</button>
         </form>
       </div>
     </div>
 
     <div class="footer">
-      <span>If you are an admin, you can add users via</span>
-      <a th:href="@{/register}">Register</a>
+      <p>New here? <a th:href="@{/register}">Register</a> and wait for admin approval.</p>
     </div>
   </div>
 </body>
