@@ -1,6 +1,7 @@
 package edu.itc.enrollment_scheduling_system.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,21 +13,31 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Course code is required")
+    @Size(max = 20, message = "Course code must not exceed 20 characters")
     @Column(nullable = false)
     private String code;
 
+    @NotBlank(message = "Course name is required")
+    @Size(max = 100, message = "Course name must not exceed 100 characters")
     @Column(nullable = false)
     private String name;
 
+    @Size(max = 1000, message = "Description must not exceed 1000 characters")
     @Column(length = 1000)
     private String description;
 
+    @NotNull(message = "Credits is required")
+    @Min(value = 1, message = "Credits must be at least 1")
     @Column(nullable = false)
     private Integer credits;
 
+    @NotNull(message = "Capacity is required")
+    @Min(value = 1, message = "Capacity must be at least 1")
     @Column(nullable = false)
     private Integer capacity;
 
+    @NotNull(message = "Teacher is required")
     @ManyToOne
     @JoinColumn(name = "teacher_id")
     private User teacher;
@@ -69,6 +80,7 @@ public class Course {
     public Set<Enrollment> getEnrollments() { return enrollments; }
     public void setEnrollments(Set<Enrollment> enrollments) { this.enrollments = enrollments; }
 
+    @Transient
     public Integer getAvailableSeats() {
         return capacity - enrollments.size();
     }
