@@ -2,8 +2,8 @@ package edu.itc.enrollment_scheduling_system.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalTime;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "classrooms")
@@ -20,14 +20,9 @@ public class Classroom {
     @Column(name = "room_name")
     private String roomName;
 
-    @Column(name = "day_of_week")
-    private String dayOfWeek;
-
-    @Column(name = "start_time")
-    private LocalTime startTime;
-
-    @Column(name = "end_time")
-    private LocalTime endTime;
+   
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
 
    
     @ManyToOne
@@ -35,11 +30,8 @@ public class Classroom {
     private Course course;
 
     
-    @ManyToMany
-    @JoinTable(
-        name = "enrollments",
-        joinColumns = @JoinColumn(name = "classroom_id"),
-        inverseJoinColumns = @JoinColumn(name = "student_id")
-    )
-    private Set<User> students;
+    @OneToMany(mappedBy = "classroom")
+    private List<Enrollment> enrollments;
+
+    
 }

@@ -34,9 +34,7 @@ CREATE TABLE courses (
 CREATE TABLE classrooms (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     room_name VARCHAR(255),
-    day_of_week VARCHAR(50),
-    start_time TIME,
-    end_time TIME,
     course_id BIGINT,
-    FOREIGN KEY (course_id) REFERENCES courses(id)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_classroom_course FOREIGN KEY (course_id) REFERENCES courses(id)
 );
