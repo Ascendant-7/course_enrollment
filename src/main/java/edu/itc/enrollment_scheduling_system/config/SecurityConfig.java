@@ -33,10 +33,10 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/login",
-                    "/register",           // public registration
+                    "/register",
                     "/css/**", "/js/**", "/images/**",
                     "/h2-console/**",
-                    "/courses", "/courses/**" // guests can still view courses
+                    "/courses", "/courses/**" // Guests can view courses
                 ).permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/teacher/**").hasRole("TEACHER")

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Manage Courses</title>
+  <style>
+    :root{--bg1:#667eea;--bg2:#764ba2;--card:#fff;--text:#111827;--shadow:0 18px 45px rgba(17,24,39,.18);}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;min-height:100vh;padding:24px;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:var(--text);}
+    .container{max-width:1200px;margin:0 auto;}
+    .header{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:20px 24px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+    h1{font-size:24px;margin:0;}
+    .btn-primary{background:#667eea;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:700;transition:all .2s;}
+    .btn-primary:hover{background:#5568d3;transform:translateY(-1px);}
+    .message{background:#d1fae5;border:1px solid #bbf7d0;color:#065f46;padding:12px 14px;border-radius:10px;margin-bottom:12px;}
+    .card{background:var(--card);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;}
+    table{width:100%;border-collapse:collapse;}
+    th,td{padding:14px;text-align:left;}
+    th{background:rgba(102,126,234,.12);font-weight:800;color:#374151;}
+    tr:nth-child(even){background:#f8fafc;}
+    .btn-sm{border:0;border-radius:6px;padding:6px 12px;font-weight:700;cursor:pointer;margin-right:6px;text-decoration:none;display:inline-block;}
+    .btn-info{background:#3b82f6;color:#fff;}
+    .btn-warning{background:#f59e0b;color:#fff;}
+    .btn-danger{background:#ef4444;color:#fff;}
+    .btn-success{background:#22c55e;color:#fff;}
+    .actions{white-space:nowrap;}
+    .actions form{display:inline;}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📚 Manage Courses</h1>
+      <div>
+        <a class="btn-primary" th:href="@{/admin/courses/create}">➕ Create Course</a>
+        <a class="btn-primary" th:href="@{/admin/dashboard}" style="background:#6b7280;margin-left:8px;">Dashboard</a>
+      </div>
+    </div>
+
+    <div th:if="${message}" class="message" th:text="${message}"></div>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th><th>Name</th><th>Credits</th><th>Max Students</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="course : ${courses}">
+            <td th:text="${course.code}"></td>
+            <td th:text="${course.name}"></td>
+            <td th:text="${course.credits}"></td>
+            <td th:text="${course.maxStudents}"></td>
+            <td class="actions">
+              <a class="btn-sm btn-info" th:href="@{/admin/courses/{id}/edit(id=${course.id})}">✏️ Edit</a>
+              <a class="btn-sm btn-success" th:href="@{/admin/courses/{id}/teachers(id=${course.id})}">👨‍🏫 Teachers</a>
+              <a class="btn-sm btn-success" th:href="@{/admin/courses/{id}/students(id=${course.id})}">🎓 Students</a>
+              <form th:action="@{/admin/courses/{id}/delete(id=${course.id})}" method="post" onsubmit="return confirm('Delete this course?');" style="display:inline;">
+                <button class="btn-sm btn-danger" type="submit">🗑️ Delete</button>
+              </form>
+            </td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(courses)}">
+            <td colspan="5" style="text-align:center;padding:30px;color:#6b7280;">No courses found. Create your first course!</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,8 +1,6 @@
 package edu.itc.enrollment_scheduling_system.model;
 
 import jakarta.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "courses")
@@ -12,37 +10,25 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false, length = 10)
     private String code;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(length = 1000)
+    @Column(length = 500)
     private String description;
 
     @Column(nullable = false)
     private Integer credits;
 
-    @Column(nullable = false)
-    private Integer capacity;
+    @Column(name = "max_students", nullable = false)
+    private Integer maxStudents = 30;
 
-    @ManyToOne
-    @JoinColumn(name = "teacher_id")
-    private User teacher;
-
-    @OneToMany(mappedBy = "course")
-    private Set<Enrollment> enrollments = new HashSet<>();
+    @Column(name = "enrolled_count", nullable = false)
+    private Integer enrolledCount = 0;
 
     public Course() {}
-
-    public Course(String code, String name, String description, Integer credits, Integer capacity) {
-        this.code = code;
-        this.name = name;
-        this.description = description;
-        this.credits = credits;
-        this.capacity = capacity;
-    }
 
     // Getters and setters
     public Long getId() { return id; }
@@ -60,16 +46,14 @@ public class Course {
     public Integer getCredits() { return credits; }
     public void setCredits(Integer credits) { this.credits = credits; }
 
-    public Integer getCapacity() { return capacity; }
-    public void setCapacity(Integer capacity) { this.capacity = capacity; }
+    public Integer getMaxStudents() { return maxStudents; }
+    public void setMaxStudents(Integer maxStudents) { this.maxStudents = maxStudents; }
 
-    public User getTeacher() { return teacher; }
-    public void setTeacher(User teacher) { this.teacher = teacher; }
+    public Integer getEnrolledCount() { return enrolledCount; }
+    public void setEnrolledCount(Integer enrolledCount) { this.enrolledCount = enrolledCount; }
 
-    public Set<Enrollment> getEnrollments() { return enrollments; }
-    public void setEnrollments(Set<Enrollment> enrollments) { this.enrollments = enrollments; }
-
-    public Integer getAvailableSeats() {
-        return capacity - enrollments.size();
+    // Calculate available seats
+    public int getAvailableSeats() {
+        return maxStudents - enrolledCount;
     }
 }
