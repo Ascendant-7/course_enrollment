@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Profile</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f7f7f7; }
+        header { background: #1e293b; color: #fff; padding: 16px 24px; }
+        main { max-width: 900px; margin: 24px auto; background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+        h1 { margin: 0 0 12px; font-size: 24px; }
+        .meta { color: #555; margin-bottom: 24px; }
+        .card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+        .row { display: flex; gap: 24px; flex-wrap: wrap; }
+        .row .col { flex: 1 1 280px; }
+        .label { color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+        .value { font-size: 16px; font-weight: 600; color: #111827; }
+        a.button, button { display: inline-block; padding: 8px 14px; background: #2563eb; color: #fff; border: none; border-radius: 6px; text-decoration: none; cursor: pointer; }
+        a.button:hover, button:hover { background: #1d4ed8; }
+        nav { margin-bottom: 16px; }
+        nav a { margin-right: 8px; color: #2563eb; text-decoration: none; }
+        nav a:hover { text-decoration: underline; }
+        ul.roles { list-style: none; padding-left: 0; margin: 4px 0 0; }
+        ul.roles li { background: #f3f4f6; display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; margin-right: 6px; }
+        form .field { margin-bottom: 12px; }
+        form label { display: block; font-size: 13px; color: #374151; margin-bottom: 6px; }
+        form input, form textarea { width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; }
+        .error { color: #b91c1c; font-size: 13px; }
+        .success { color: #065f46; font-size: 14px; margin-bottom: 12px; }
+        .readonly { background: #f9fafb; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>User Profile</h1>
+</header>
+<main>
+    <nav>
+        <a href="/student/dashboard" th:if="${#authorization.expression('hasRole(''STUDENT'')')}">Student Dashboard</a>
+        <a href="/teacher/dashboard" th:if="${#authorization.expression('hasRole(''TEACHER'')')}">Teacher Dashboard</a>
+        <a href="/admin/dashboard" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Admin Dashboard</a>
+    </nav>
+
+    <div class="card">
+        <div class="row">
+            <div class="col">
+                <div class="label">Full Name</div>
+                <div class="value" th:text="${user.fullName} ?: 'Not set'"></div>
+            </div>
+            <div class="col">
+                <div class="label">Username</div>
+                <div class="value" th:text="${user.username}"></div>
+            </div>
+            <div class="col">
+                <div class="label">Email</div>
+                <div class="value" th:text="${user.email} ?: 'Not set'"></div>
+            </div>
+            <div class="col">
+                <div class="label">Account Status</div>
+                <div class="value" th:text="${user.enabled} ? 'Enabled' : 'Disabled'"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="label">Roles</div>
+        <ul class="roles">
+            <li th:each="role : ${user.roles}" th:text="${role.name}"></li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <div class="row">
+            <div class="col">
+                <form th:action="@{/user/profile}" method="post" th:object="${form}">
+                    <div th:if="${success}" class="success" th:text="${success}"></div>
+
+                    <h2>Edit Profile</h2>
+                    <div class="field">
+                        <label for="username">Username</label>
+                        <input id="username" type="text" th:field="*{username}" />
+                        <div class="error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+                    </div>
+
+                    <div class="field">
+                        <label for="fullName">Full Name (read-only)</label>
+                        <input id="fullName" type="text" th:field="*{fullName}" class="readonly" readonly />
+                    </div>
+
+                    <div class="field">
+                        <label for="email">Email</label>
+                        <input id="email" type="email" th:field="*{email}" />
+                        <div class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                    </div>
+
+                    <div class="field">
+                        <label for="phone">Phone</label>
+                        <input id="phone" type="text" th:field="*{phone}" />
+                    </div>
+
+                    <div class="field">
+                        <label for="address">Address</label>
+                        <input id="address" type="text" th:field="*{address}" />
+                    </div>
+
+                    <div class="field">
+                        <label for="bio">Bio</label>
+                        <textarea id="bio" rows="3" th:field="*{bio}"></textarea>
+                    </div>
+
+                    <h2>Change Password</h2>
+                    <p style="margin-top:-8px;color:#6b7280;font-size:13px;">Provide your old password to set a new password.</p>
+                    <div class="row">
+                        <div class="col">
+                            <div class="field">
+                                <label for="oldPassword">Old Password</label>
+                                <input id="oldPassword" type="password" th:field="*{oldPassword}" />
+                                <div class="error" th:if="${#fields.hasErrors('oldPassword')}" th:errors="*{oldPassword}"></div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="field">
+                                <label for="newPassword">New Password</label>
+                                <input id="newPassword" type="password" th:field="*{newPassword}" />
+                                <div class="error" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}"></div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="field">
+                                <label for="confirmNewPassword">Confirm New Password</label>
+                                <input id="confirmNewPassword" type="password" th:field="*{confirmNewPassword}" />
+                                <div class="error" th:if="${#fields.hasErrors('confirmNewPassword')}" th:errors="*{confirmNewPassword}"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <button type="submit">Save Changes</button>
+                        <a class="button" href="/logout" style="background:#6b7280;margin-left:8px;">Log out</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

@@ -58,6 +58,7 @@ public class DataInitializer implements CommandLineRunner {
             teacher.getRoles().add(teacherRole);
             users.save(teacher);
         }
+        
 
         // Create sample courses
         if (courses.count() == 0) {

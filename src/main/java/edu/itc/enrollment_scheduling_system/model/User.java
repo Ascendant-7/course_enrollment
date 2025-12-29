@@ -21,6 +21,22 @@ public class User {
     @Column(nullable = false)
     private boolean enabled = true;
 
+    // Profile fields
+    @Column(name = "full_name")
+    private String fullName; // read-only from profile page per requirements
+
+    @Column
+    private String email;
+
+    @Column(length = 1000)
+    private String bio;
+
+    @Column
+    private String phone;
+
+    @Column
+    private String address;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
@@ -44,4 +60,19 @@ public class User {
 
     public Set<Role> getRoles() { return roles; }
     public void setRoles(Set<Role> roles) { this.roles = roles; }
+
+    public String getFullName() { return fullName; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getBio() { return bio; }
+    public void setBio(String bio) { this.bio = bio; }
+
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
 }
