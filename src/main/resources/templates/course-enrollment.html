@@ -127,6 +127,27 @@
             border-bottom: 2px solid #667eea;
         }
 
+        .search-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
         .course-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -141,6 +162,8 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .course-card:hover {
@@ -294,9 +317,12 @@
         <div class="header">
             <h1>📚 Course Enrollment</h1>
             <div class="header-actions">
-                <span th:text="'Welcome, ' + ${student.username}"></span>
-                <a th:href="@{/student/dashboard}" class="btn btn-secondary">Dashboard</a>
-                <a th:href="@{/logout}" class="btn btn-danger">Logout</a>
+                <span th:if="${student != null}" th:text="'Welcome, ' + ${student.username}"></span>
+                <span th:if="${teacher != null}" th:text="'Welcome, ' + ${teacher.username}"></span>
+                <a th:if="${student != null}" th:href="@{/student/dashboard}" class="btn btn-secondary">Dashboard</a>
+                <a th:if="${teacher != null}" th:href="@{/teacher/dashboard}" class="btn btn-secondary">Dashboard</a>
+                <a th:if="${student != null or teacher != null}" th:href="@{/logout}" class="btn btn-danger">Logout</a>
+                <a th:if="${student == null and teacher == null}" th:href="@{/login}" class="btn btn-primary">Login</a>
             </div>
         </div>
 
@@ -306,7 +332,7 @@
         </div>
 
         <!-- My Enrollments Section -->
-        <div class="section">
+        <div th:if="${student != null}" class="section">
             <h2>📋 My Enrolled Courses</h2>
             <div th:if="${enrollments.isEmpty()}" class="empty-state">
                 <div class="empty-state-icon">📭</div>
@@ -351,9 +377,48 @@
             </table>
         </div>
 
+        <!-- My Teaching Courses Section -->
+        <div th:if="${teacher != null}" class="section">
+            <h2>👨‍🏫 My Teaching Courses</h2>
+            <div th:if="${taughtCourses.isEmpty()}" class="empty-state">
+                <div class="empty-state-icon">📚</div>
+                <p>You are not assigned to teach any courses yet.</p>
+            </div>
+            <div th:if="${!taughtCourses.isEmpty()}" class="course-grid">
+                <div class="course-card" th:each="course : ${taughtCourses}">
+                    <div class="course-code" th:text="${course.code}"></div>
+                    <div class="course-name" th:text="${course.name}"></div>
+                    <div class="course-description" th:text="${course.description}"></div>
+                    
+                    <div class="course-info">
+                        <div class="info-item">
+                            <span class="info-label">Credits</span>
+                            <span class="info-value" th:text="${course.credits}"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Capacity</span>
+                            <span class="info-value" th:text="${course.capacity}"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Enrolled</span>
+                            <span class="info-value" th:text="${course.enrollments.size()}"></span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: auto; text-align: center;">
+                        <a th:href="@{/courses/{id}(id=${course.id})}" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Available Courses Section -->
         <div class="section">
             <h2>🎓 Available Courses</h2>
+            <form th:action="${teacher != null ? '/teacher/courses' : (student != null ? '/student/courses' : '/courses')}" method="get" class="search-form">
+                <input type="text" name="search" th:value="${search}" placeholder="Search courses by name or code..." class="search-input">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
             <div th:if="${courses.isEmpty()}" class="empty-state">
                 <div class="empty-state-icon">📚</div>
                 <p>No courses available at the moment.</p>
@@ -381,16 +446,34 @@
                         </div>
                     </div>
 
-                    <!-- Enrollment Button -->
-                    <form th:action="@{/student/enroll/{id}(id=${course.id})}" method="post">
-                        <button type="submit" 
-                                class="btn btn-success" 
-                                style="width: 100%;"
-                                th:disabled="${course.availableSeats <= 0}">
-                            <span th:if="${course.availableSeats > 0}">Enroll Now</span>
-                            <span th:if="${course.availableSeats <= 0}">Course Full</span>
-                        </button>
-                    </form>
+                    <div style="margin-top: auto; text-align: center;">
+                        <!-- View Details Link -->
+                        <a th:href="@{/courses/{id}(id=${course.id})}" class="btn btn-secondary" style="width: 100%; margin-bottom: 10px; text-align: center;">View Details</a>
+
+                        <!-- Student Actions -->
+                        <form th:if="${student != null}" th:action="@{/student/enroll/{id}(id=${course.id})}" method="post" style="margin-bottom: 10px;">
+                            <button type="submit" 
+                                    class="btn btn-success" 
+                                    style="width: 100%;"
+                                    th:disabled="${course.availableSeats <= 0}">
+                                <span th:if="${course.availableSeats > 0}">Enroll Now</span>
+                                <span th:if="${course.availableSeats <= 0}">Course Full</span>
+                            </button>
+                        </form>
+
+                        <!-- Teacher Actions -->
+                        <div th:if="${teacher != null}" style="margin-bottom: 10px;">
+                            <span th:if="${course.teacher != null and course.teacher.id == teacher.id}" class="btn btn-info" style="width: 100%; background: #17a2b8; color: white; cursor: default;">Teaching This Course</span>
+                            <span th:if="${course.teacher == null or course.teacher.id != teacher.id}" class="btn btn-secondary" style="width: 100%; cursor: default;">Not Teaching</span>
+                        </div>
+
+                        <div th:if="${student == null and teacher == null}">
+                            <a th:href="@{/login}" class="btn btn-primary" style="width: 100%; font-weight: bold;">Login to Enroll in Courses</a>
+                            <p style="text-align: center; margin-top: 10px; font-size: 14px; color: #666;">
+                                Create an account or sign in to enroll in courses and manage your schedule.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

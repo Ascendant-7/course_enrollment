@@ -29,7 +29,7 @@ public class StudentController {
     }
 
     @GetMapping("/courses")
-    public String viewCourses(Model model, Authentication authentication) {
+    public String viewCourses(Model model, @RequestParam(required = false) String search, Authentication authentication) {
         User student = userRepository.findByUsername(authentication.getName()).orElse(null);
         
         if (student == null) {
@@ -37,11 +37,19 @@ public class StudentController {
         }
 
         List<Course> allCourses = enrollmentService.getAllCourses();
+        if (search != null && !search.trim().isEmpty()) {
+            String searchLower = search.toLowerCase();
+            allCourses = allCourses.stream()
+                .filter(course -> (course.getName() != null && course.getName().toLowerCase().contains(searchLower)) ||
+                                 (course.getCode() != null && course.getCode().toLowerCase().contains(searchLower)))
+                .toList();
+        }
         List<Enrollment> myEnrollments = enrollmentService.getStudentEnrollments(student);
 
         model.addAttribute("courses", allCourses);
         model.addAttribute("enrollments", myEnrollments);
         model.addAttribute("student", student);
+        model.addAttribute("search", search);
         
         return "course-enrollment";
     }

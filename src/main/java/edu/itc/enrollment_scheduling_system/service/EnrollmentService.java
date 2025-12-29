@@ -74,4 +74,16 @@ public class EnrollmentService {
     public boolean isStudentEnrolled(User student, Course course) {
         return enrollmentRepository.existsByStudentAndCourse(student, course);
     }
+
+    public Course getCourseById(Long id) {
+        return courseRepository.findById(id).orElse(null);
+    }
+
+    public List<Enrollment> getCourseEnrollments(Course course) {
+        return enrollmentRepository.findByCourse(course);
+    }
+
+    public List<Course> getCoursesByTeacher(User teacher) {
+        return courseRepository.findByTeacher(teacher);
+    }
 }
