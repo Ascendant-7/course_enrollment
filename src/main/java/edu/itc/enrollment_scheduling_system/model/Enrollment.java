@@ -66,4 +66,12 @@ public class Enrollment {
 
     public String getGrade() { return grade; }
     public void setGrade(String grade) { this.grade = grade; }
+
+    public Classroom getClassroom() { 
+        return classroom; 
+    }
+
+    public void setClassroom(Classroom classroom) { 
+        this.classroom = classroom; 
+    }
 }
