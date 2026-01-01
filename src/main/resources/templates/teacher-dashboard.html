@@ -1,12 +1,43 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head><meta charset="UTF-8"><title>Teacher</title></head>
-<body>
-<h1>Teacher Dashboard</h1>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body class="dashboard-body">
+    <div class="dashboard-container">
+        <h1>👨‍🏫 Teacher Dashboard</h1>
 
-<form th:action="@{/logout}" method="post">
-  <button type="submit">Logout</button>
-</form>
+        <div class="menu-grid">
+            <a href="/teacher/courses" class="menu-item">
+                <div class="menu-icon">📚</div>
+                <div class="menu-text">My Courses</div>
+            </a>
 
+            <a href="/teacher/assignments" class="menu-item">
+                <div class="menu-icon">📋</div>
+                <div class="menu-text">Assignments</div>
+            </a>
+
+            <a href="#" class="menu-item">
+                <div class="menu-icon">📅</div>
+                <div class="menu-text">Schedule</div>
+            </a>
+
+            <a href="#" class="menu-item">
+                <div class="menu-icon">👤</div>
+                <div class="menu-text">Profile</div>
+            </a>
+        </div>
+
+        <div class="logout-section">
+            <!-- Replace the GET link with POST logout -->
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

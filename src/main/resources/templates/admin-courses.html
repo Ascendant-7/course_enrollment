@@ -4,87 +4,7 @@
     <meta charset="UTF-8">
     <title>Admin - Course Management</title>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        .btn {
-            padding: 6px 12px;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .btn-success {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-
-        .message {
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
-
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .empty {
-            text-align: center;
-            padding: 20px;
-            color: #777;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
 </head>
 
 <body>
@@ -99,10 +19,10 @@
     </div>
 
     <!-- Success Message -->
-    <div th:if="${message}" class="message success" th:text="${message}"></div>
+    <div th:if="${message}" class="admin-message admin-success" th:text="${message}"></div>
 
     <!-- Course Table -->
-    <table th:if="${#lists.isNotEmpty(courses)}">
+    <table th:if="${#lists.isNotEmpty(courses)}" class="admin-courses-table">
         <thead>
         <tr>
             <th>ID</th>
@@ -138,7 +58,7 @@
     </table>
 
     <!-- Empty State -->
-    <div th:if="${#lists.isEmpty(courses)}" class="empty">
+    <div th:if="${#lists.isEmpty(courses)}" class="admin-empty">
         No courses found.
     </div>
 

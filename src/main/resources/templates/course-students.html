@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${course.name} + ' - Students'">Course Students</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 th:text="${course.name} + ' - Students'">Course Students</h1>
+            <div class="header-actions">
+                <a th:href="${isTeacher ? '/teacher/courses' : '/courses'}" class="btn btn-secondary">Back to Courses</a>
+                <a th:if="${student != null or isTeacher}" th:href="@{/logout}" class="btn btn-danger">Logout</a>
+                <a th:if="${student == null and !isTeacher}" th:href="@{/login}" class="btn btn-primary">Login</a>
+            </div>
+        </div>
+
+        <!-- Course Details Section -->
+        <div class="section">
+            <h2>Course Information</h2>
+            <div class="course-info">
+                <div class="info-item">
+                    <span class="info-label">Course Code</span>
+                    <span class="info-value" th:text="${course.code}">CODE</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Course Name</span>
+                    <span class="info-value" th:text="${course.name}">Name</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Credits</span>
+                    <span class="info-value" th:text="${course.credits}">Credits</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Capacity</span>
+                    <span class="info-value" th:text="${course.capacity}">Capacity</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Students Section -->
+        <div class="section">
+            <h2>Enrolled Students</h2>
+            <div th:if="${enrollments.isEmpty()}" class="empty-state">
+                <div class="empty-state-icon">👥</div>
+                <p>No students enrolled in this course yet.</p>
+            </div>
+            <div th:each="enrollment : ${enrollments}" class="student-card">
+                <div class="student-info">
+                    <div class="student-name" th:text="${enrollment.student.username}">Student Username</div>
+                    <div class="student-username" th:text="'@' + ${enrollment.student.username}">Username</div>
+                    <div class="enrollment-date" th:text="'Enrolled: ' + ${enrollment.enrollmentDate}">Enrollment Date</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Section -->
+        <div class="section">
+            <h2>Members</h2>
+            <div class="nav-links">
+                <a th:href="@{/courses/{id}/teachers(id=${course.id})}" class="btn btn-primary">View Teachers</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

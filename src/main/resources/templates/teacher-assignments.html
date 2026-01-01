@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Assignments</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 My Assignments</h1>
+            <div class="header-actions">
+                <a href="/teacher/dashboard" class="btn btn-secondary">Dashboard</a>
+                <a href="/teacher/courses" class="btn btn-primary">My Courses</a>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-secondary">Logout</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Pending Tasks</h2>
+            <div th:if="${courses.isEmpty()}" class="empty-state">
+                <div class="empty-state-icon">✅</div>
+                <p>No pending assignments at the moment.</p>
+                <p>All caught up! 🎉</p>
+            </div>
+            <div th:if="${!courses.isEmpty()}" class="assignment-grid">
+                <div th:each="course : ${courses}" class="assignment-card">
+                    <!-- Course Management Task -->
+                    <div class="assignment-title" th:text="${course.name}">Course Name</div>
+                    <span class="assignment-type type-course">Course Management</span>
+                    <div class="assignment-description">
+                        Manage your course: <span th:text="${course.code}">COURSE101</span>.
+                        <span th:text="${course.enrollments.size()}">X</span> students enrolled.
+                    </div>
+                    <div class="assignment-meta">
+                        <span>Priority: Normal</span>
+                        <span>Due: Ongoing</span>
+                    </div>
+                    <div class="assignment-actions">
+                        <a th:href="@{/courses/{id}(id=${course.id})}" class="btn btn-primary">Manage Course</a>
+                    </div>
+                </div>
+
+                <!-- Mock grading assignments for each course -->
+                <div th:each="course : ${courses}" class="assignment-card">
+                    <div class="assignment-title" th:text="'Grade Assignments - ' + ${course.name}">Grade Assignments</div>
+                    <span class="assignment-type type-grading">Grading</span>
+                    <div class="assignment-description">
+                        Review and grade student assignments for <span th:text="${course.code}">COURSE101</span>.
+                        <span th:text="${course.enrollments.size()}">X</span> submissions to review.
+                    </div>
+                    <div class="assignment-meta">
+                        <span>Priority: High</span>
+                        <span>Due: This Week</span>
+                    </div>
+                    <div class="assignment-actions">
+                        <a th:href="@{/courses/{id}/students(id=${course.id})}" class="btn btn-primary">View Students</a>
+                    </div>
+                </div>
+
+                <!-- Enrollment review tasks -->
+                <div th:if="${courses.size() > 0}" class="assignment-card">
+                    <div class="assignment-title">Review New Enrollments</div>
+                    <span class="assignment-type type-enrollment">Enrollment Review</span>
+                    <div class="assignment-description">
+                        Review recent student enrollments across all your courses.
+                        Ensure capacity limits are not exceeded.
+                    </div>
+                    <div class="assignment-meta">
+                        <span>Priority: Medium</span>
+                        <span>Due: Daily</span>
+                    </div>
+                    <div class="assignment-actions">
+                        <a href="/teacher/courses" class="btn btn-primary">Check Enrollments</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Quick Actions</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                <a href="/teacher/courses" class="btn btn-primary" style="text-align: center; padding: 20px;">View My Courses</a>
+                <a href="/courses" class="btn btn-secondary" style="text-align: center; padding: 20px;">Browse All Courses</a>
+                <a href="#" class="btn btn-secondary" style="text-align: center; padding: 20px;">Schedule</a>
+                <a href="#" class="btn btn-secondary" style="text-align: center; padding: 20px;">Reports</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
