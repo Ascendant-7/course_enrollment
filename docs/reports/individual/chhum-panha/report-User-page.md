@@ -27,6 +27,7 @@ This report covers only the user page implementation: routing, security, templat
   - `src/main/java/edu/itc/enrollment_scheduling_system/repository/UserRepository.java`
   - `src/main/java/edu/itc/enrollment_scheduling_system/model/User.java`
   - `src/main/java/edu/itc/enrollment_scheduling_system/dto/UserProfileForm.java`
+  - `src/main/java/edu/itc/enrollment_scheduling_system/service/UserService.java`
   - `src/main/java/edu/itc/enrollment_scheduling_system/config/DataInitializer.java` (role seeding)
 
 
@@ -36,7 +37,7 @@ This report covers only the user page implementation: routing, security, templat
   - Purpose: Default landing page for STUDENT users after login.
   - View: `templates/student-dashboard.html`
 - `GET /user/profile`
-  - Purpose: Display current authenticated user’s profile details.
+  - Purpose: Display current authenticated user's profile details.
   - View: `templates/user-profile.html`
 - `POST /user/profile`
   - Purpose: Update profile fields with server-side validation using `UserProfileForm`.
@@ -60,8 +61,9 @@ This report covers only the user page implementation: routing, security, templat
   - Exposes `GET /student/dashboard` to return the `student-dashboard.html` view.
   - Ensures the authenticated user context is available for UI personalization.
 - UserController
-  - `GET /user/profile` populates the form with current user data (via the security principal/UserRepository).
-  - `POST /user/profile` validates input (`UserProfileForm`), persists allowed fields, and returns feedback messages.
+  - `GET /user/profile` populates the form with current user data using `UserService.toForm()`.
+  - `POST /user/profile` validates input (`UserProfileForm`), handles password changes via `UserService.changePassword()`, persists allowed fields, and returns feedback messages.
+  - Uses `UserService.getCurrentUser()` to retrieve the authenticated user.
 
 ### 6.2 Templates
 - `student-dashboard.html`
@@ -70,6 +72,7 @@ This report covers only the user page implementation: routing, security, templat
 - `user-profile.html`
   - Shows a profile form for editable fields (e.g., name, email) and readonly fields where appropriate (e.g., username).
   - Displays validation errors and success messages.
+  - Uses `form.xxx` attributes for display and form binding, avoiding direct exposure of the user entity.
 
 ### 6.3 Security
 - `SecurityConfig`
@@ -81,8 +84,9 @@ This report covers only the user page implementation: routing, security, templat
   - Seeds roles (`ROLE_STUDENT`, `ROLE_TEACHER`, `ROLE_ADMIN`) and optional test users to validate flows.
 
 ### 6.4 Data Access
-- `UserRepository` used to fetch and update the authenticated user’s record.
+- `UserRepository` used to fetch and update the authenticated user's record.
 - `User` model provides persistent fields mapped to profile form fields with basic constraints.
+- `UserService` abstracts common user-related operations, including form conversion and password change logic.
 
 ## 7. Testing and Verification
 ### 7.1 Preconditions
@@ -107,17 +111,18 @@ This report covers only the user page implementation: routing, security, templat
 
 ## 8. Risks and Mitigations
 - Risk: Exposing fields not intended to be edited by users.
-  - Mitigation: Limit editable fields in `UserProfileForm` and ignore sensitive attributes (roles, username).
+  - Mitigation: Limit editable fields in `UserProfileForm` and ignore sensitive attributes (roles, username). The user entity is not added to the model to prevent unintended access.
 - Risk: Broken redirects if role names change.
   - Mitigation: Centralize role-to-URL mapping in `RoleBasedSuccessHandler`; keep role constants consistent.
 
 ## 9. Outcome
 - Student users now have a clear, protected landing page at `/student/dashboard`.
-- A functional user profile page at `/user/profile` enables basic self-service account updates.
+- A functional user profile page at `/user/profile` enables basic self-service account updates, including password changes.
 - Post-login behavior is consistent and role-aware via `RoleBasedSuccessHandler`.
+- Code is refactored for better maintainability using Lombok and service layer abstraction.
 
 ## 10. Future Enhancements
-- Add avatar upload and password change flow (with current password verification).
+- Add avatar upload.
 - Add CSRF tokens to profile form and confirm they are enabled in `SecurityConfig`.
 - Add integration tests for role-based redirects and controller access.
 - Enhance dashboard with recent courses, enrollments, and notifications.

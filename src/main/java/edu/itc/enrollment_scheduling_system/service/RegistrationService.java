@@ -12,13 +12,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class RegistrationService {
 
-    private final UserRepository users;
-    private final RoleRepository roles;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public RegistrationService(UserRepository users, RoleRepository roles, PasswordEncoder passwordEncoder) {
-        this.users = users;
-        this.roles = roles;
+    public RegistrationService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -27,7 +27,7 @@ public class RegistrationService {
         if (form.getUsername() == null || form.getUsername().isBlank()) {
             throw new IllegalArgumentException("Username is required");
         }
-        if (users.existsByUsername(form.getUsername())) {
+        if (userRepository.existsByUsername(form.getUsername())) {
             throw new IllegalArgumentException("Username already exists");
         }
         if (form.getPassword() == null || form.getPassword().isBlank()) {
@@ -37,14 +37,14 @@ public class RegistrationService {
             throw new IllegalArgumentException("Passwords do not match");
         }
 
-        var studentRole = roles.findByName("ROLE_STUDENT")
-                .orElseGet(() -> roles.save(new Role("ROLE_STUDENT")));
+        var studentRole = roleRepository.findByName("ROLE_STUDENT")
+                .orElseGet(() -> roleRepository.save(new Role("ROLE_STUDENT")));
 
         var user = new User();
         user.setUsername(form.getUsername());
         user.setPassword(passwordEncoder.encode(form.getPassword()));
         user.getRoles().add(studentRole);
 
-        users.save(user);
+        userRepository.save(user);
     }
 }
