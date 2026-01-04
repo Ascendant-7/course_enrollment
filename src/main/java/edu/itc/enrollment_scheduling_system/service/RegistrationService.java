@@ -24,48 +24,49 @@ public class RegistrationService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // Public self-registration: always STUDENT, pending approval
-    public void registerPublic(RegisterForm form) {
-        if (userRepository.existsByUsername(form.getUsername())) {
-            throw new IllegalArgumentException("Username already exists");
-        }
-        if (!form.getPassword().equals(form.getConfirmPassword())) {
-            throw new IllegalArgumentException("Passwords do not match");
+    public User registerUser(RegisterForm form) {
+        if (userRepository.findByUsername(form.getUsername()).isPresent()) {
+            throw new RuntimeException("Username already exists");
         }
 
-        Role role = roleRepository.findByName("ROLE_STUDENT")
-                .orElseThrow(() -> new IllegalStateException("ROLE_STUDENT not found"));
+        if (userRepository.findByEmail(form.getEmail()).isPresent()) {
+            throw new RuntimeException("Email already exists");
+        }
 
         User user = new User();
         user.setUsername(form.getUsername());
+        user.setEmail(form.getEmail());
         user.setPassword(passwordEncoder.encode(form.getPassword()));
+        user.setFirstName(form.getFirstName());
+        user.setLastName(form.getLastName());
+        user.setApproved(false);
         user.setEnabled(true);
-        user.setApproved(false); // pending admin approval
-        user.getRoles().add(role);
 
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
-    // Admin-created users: selectable role, auto-approved
-    public void registerAdmin(AdminCreateUserForm form) {
-        if (userRepository.existsByUsername(form.getUsername())) {
+    public User registerAdmin(AdminCreateUserForm form) {
+        if (userRepository.findByUsername(form.getUsername()).isPresent()) {
             throw new IllegalArgumentException("Username already exists");
         }
-        if (!form.getPassword().equals(form.getConfirmPassword())) {
-            throw new IllegalArgumentException("Passwords do not match");
+
+        if (userRepository.findByEmail(form.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email already exists");
         }
 
-        String roleName = "ROLE_" + form.getRole().toUpperCase();
-        Role role = roleRepository.findByName(roleName)
-                .orElseThrow(() -> new IllegalStateException(roleName + " not found"));
+        Role role = roleRepository.findById(form.getRoleId())
+            .orElseThrow(() -> new IllegalArgumentException("Role not found"));
 
         User user = new User();
         user.setUsername(form.getUsername());
+        user.setEmail(form.getEmail());
         user.setPassword(passwordEncoder.encode(form.getPassword()));
+        user.setFirstName(form.getFirstName());
+        user.setLastName(form.getLastName());
+        user.setApproved(true);
         user.setEnabled(true);
-        user.setApproved(true); // admin-added users are approved immediately
         user.getRoles().add(role);
 
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 }

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Course Form</title>
+
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+
+<body>
+<div class="course-form-container">
+
+    <h1 th:text="${course.id == null ? 'Create New Course' : 'Edit Course'}"></h1>
+
+    <form th:action="@{/admin/courses}"
+          th:object="${course}"
+          method="post">
+
+        <!-- Course Code -->
+        <div class="form-group">
+            <label for="code">
+                Course Code <span class="required">*</span>
+            </label>
+            <input type="text"
+                   id="code"
+                   th:field="*{code}"
+                   placeholder="e.g., IT101"
+                   th:classappend="${#fields.hasErrors('code')} ? 'field-error'">
+            <div th:if="${#fields.hasErrors('code')}"
+                 th:errors="*{code}"
+                 class="form-error"></div>
+        </div>
+
+        <!-- Course Name -->
+        <div class="form-group">
+            <label for="name">
+                Course Name <span class="required">*</span>
+            </label>
+            <input type="text"
+                   id="name"
+                   th:field="*{name}"
+                   placeholder="Introduction to Computer Science"
+                   th:classappend="${#fields.hasErrors('name')} ? 'field-error'">
+            <div th:if="${#fields.hasErrors('name')}"
+                 th:errors="*{name}"
+                 class="form-error"></div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description"
+                      th:field="*{description}"
+                      placeholder="Course description (optional)"
+                      th:classappend="${#fields.hasErrors('description')} ? 'field-error'"></textarea>
+            <div th:if="${#fields.hasErrors('description')}"
+                 th:errors="*{description}"
+                 class="form-error"></div>
+        </div>
+
+        <!-- Credits -->
+        <div class="form-group">
+            <label for="credits">
+                Credits <span class="required">*</span>
+            </label>
+            <input type="number"
+                   id="credits"
+                   th:field="*{credits}"
+                   min="1"
+                   max="10"
+                   placeholder="1 - 10"
+                   th:classappend="${#fields.hasErrors('credits')} ? 'field-error'">
+            <div th:if="${#fields.hasErrors('credits')}"
+                 th:errors="*{credits}"
+                 class="form-error"></div>
+        </div>
+
+        <!-- Capacity -->
+        <div class="form-group">
+            <label for="capacity">
+                Capacity <span class="required">*</span>
+            </label>
+            <input type="number"
+                   id="capacity"
+                   th:field="*{capacity}"
+                   min="1"
+                   max="100"
+                   placeholder="Maximum number of students"
+                   th:classappend="${#fields.hasErrors('capacity')} ? 'field-error'">
+            <div th:if="${#fields.hasErrors('capacity')}"
+                 th:errors="*{capacity}"
+                 class="form-error"></div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                Save Course
+            </button>
+            <a th:href="@{/admin/courses}" class="btn btn-secondary">
+                Cancel
+            </a>
+        </div>
+
+    </form>
+</div>
+</body>
+</html>

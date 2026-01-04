@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${course.name} + ' - Teachers'">Course Teachers</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 th:text="${course.name} + ' - Teachers'">Course Teachers</h1>
+            <div class="header-actions">
+                <a th:href="${isTeacher ? '/teacher/courses' : '/courses'}" class="btn btn-secondary">Back to Courses</a>
+                <a th:if="${student != null or isTeacher}" th:href="@{/logout}" class="btn btn-danger">Logout</a>
+                <a th:if="${student == null and !isTeacher}" th:href="@{/login}" class="btn btn-primary">Login</a>
+            </div>
+        </div>
+
+        <!-- Course Details Section -->
+        <div class="section">
+            <h2>Course Information</h2>
+            <div class="course-info">
+                <div class="info-item">
+                    <span class="info-label">Course Code</span>
+                    <span class="info-value" th:text="${course.code}">CODE</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Course Name</span>
+                    <span class="info-value" th:text="${course.name}">Name</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Credits</span>
+                    <span class="info-value" th:text="${course.credits}">Credits</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Capacity</span>
+                    <span class="info-value" th:text="${course.capacity}">Capacity</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teachers Section -->
+        <div class="section">
+            <h2>Course Teacher</h2>
+            <div th:if="${teacher != null}" class="teacher-card">
+                <div class="teacher-name" th:text="${teacher.username}">Teacher Username</div>
+                <div class="teacher-username" th:text="'@' + ${teacher.username}">Username</div>
+            </div>
+            <div th:if="${teacher == null}" class="empty-state">
+                <div class="empty-state-icon">👨‍🏫</div>
+                <p>No teacher assigned to this course.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

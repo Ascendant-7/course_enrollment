@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${classroom.id != null ? 'Edit Classroom' : 'Create Classroom'}">Classroom Form</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>
+        .form-container {
+            max-width: 600px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1 th:text="${classroom.id != null ? 'Edit Classroom' : 'Create Classroom'}">Classroom Form</h1>
+        
+        <form th:action="${classroom.id != null ? '/teacher/classrooms/' + classroom.id + '/edit' : '/teacher/classrooms/create'}" 
+              method="post" 
+              th:object="${classroom}">
+            
+            <div class="form-group">
+                <label for="name">Classroom Name *</label>
+                <input type="text" id="name" th:field="*{name}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="building">Building *</label>
+                <input type="text" id="building" th:field="*{building}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="roomNumber">Room Number *</label>
+                <input type="text" id="roomNumber" th:field="*{roomNumber}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="capacity">Capacity *</label>
+                <input type="number" id="capacity" th:field="*{capacity}" min="1" required>
+            </div>
+
+            <div class="form-group">
+                <label for="course">Assign to Course (Optional)</label>
+                <select id="course" th:field="*{course}">
+                    <option value="">-- Select Course --</option>
+                    <option th:each="c : ${courses}" 
+                            th:value="${c.id}" 
+                            th:text="${c.code + ' - ' + c.name}">Course</option>
+                </select>
+            </div>
+
+            <div>
+                <button type="submit" class="btn btn-primary" 
+                        th:text="${classroom.id != null ? 'Update Classroom' : 'Create Classroom'}">Submit</button>
+                <a th:href="@{/teacher/classrooms}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
