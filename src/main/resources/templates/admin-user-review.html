@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Review User Registration</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>
+        .user-details {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        .course-selection {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: #e9ecef;
+            border-radius: 4px;
+        }
+        .course-selection.visible {
+            display: block;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+    </style>
+    <script>
+        function toggleCourseSelection() {
+            const roleSelect = document.getElementById('roleSelect');
+            const courseSelection = document.getElementById('courseSelection');
+            const selectedRole = roleSelect.options[roleSelect.selectedIndex].text;
+            
+            if (selectedRole.includes('TEACHER')) {
+                courseSelection.classList.add('visible');
+            } else {
+                courseSelection.classList.remove('visible');
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Review User Registration</h1>
+        <p><a th:href="@{/admin/approvals}">← Back to Approvals</a></p>
+
+        <div class="user-details">
+            <h2>User Information</h2>
+            <p><strong>Username:</strong> <span th:text="${user.username}">Username</span></p>
+            <p><strong>Email:</strong> <span th:text="${user.email}">Email</span></p>
+            <p><strong>First Name:</strong> <span th:text="${user.firstName}">First Name</span></p>
+            <p><strong>Last Name:</strong> <span th:text="${user.lastName}">Last Name</span></p>
+            <p><strong>Registration Date:</strong> <span th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm')}">Date</span></p>
+        </div>
+
+        <form th:action="@{/admin/approvals/{id}/approve(id=${user.id})}" method="post">
+            <div class="form-group">
+                <label for="roleSelect">Assign Role:</label>
+                <select id="roleSelect" name="roleId" required onchange="toggleCourseSelection()">
+                    <option value="">-- Select Role --</option>
+                    <option th:each="role : ${roles}" 
+                            th:value="${role.id}" 
+                            th:text="${role.name}">Role</option>
+                </select>
+            </div>
+
+            <div id="courseSelection" class="course-selection">
+                <label>Assign Courses (for Teachers):</label>
+                <p><small>Select at least one course to assign to this teacher</small></p>
+                <div th:each="course : ${courses}">
+                    <label>
+                        <input type="checkbox" name="courseIds" th:value="${course.id}">
+                        <span th:text="${course.code + ' - ' + course.name}">Course</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-success">✓ Approve User</button>
+            </div>
+        </form>
+
+        <form th:action="@{/admin/approvals/{id}/deny(id=${user.id})}" method="post" 
+              onsubmit="return confirm('Are you sure you want to deny this registration? This will delete the user.');">
+            <button type="submit" class="btn btn-danger">✗ Deny Registration</button>
+        </form>
+    </div>
+</body>
+</html>

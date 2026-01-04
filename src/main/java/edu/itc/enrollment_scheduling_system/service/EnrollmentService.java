@@ -5,85 +5,77 @@ import edu.itc.enrollment_scheduling_system.model.Enrollment;
 import edu.itc.enrollment_scheduling_system.model.User;
 import edu.itc.enrollment_scheduling_system.repository.CourseRepository;
 import edu.itc.enrollment_scheduling_system.repository.EnrollmentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import edu.itc.enrollment_scheduling_system.repository.UserRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class EnrollmentService {
 
-    @Autowired
-    private EnrollmentRepository enrollmentRepository;
+    private final EnrollmentRepository enrollmentRepository;
+    private final CourseRepository courseRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private CourseRepository courseRepository;
+    public EnrollmentService(EnrollmentRepository enrollmentRepository,
+                            CourseRepository courseRepository,
+                            UserRepository userRepository) {
+        this.enrollmentRepository = enrollmentRepository;
+        this.courseRepository = courseRepository;
+        this.userRepository = userRepository;
+    }
+
+    public void enrollStudent(Long studentId, Long courseId) {
+        User student = userRepository.findById(studentId)
+            .orElseThrow(() -> new RuntimeException("Student not found"));
+        
+        Course course = courseRepository.findById(courseId)
+            .orElseThrow(() -> new RuntimeException("Course not found"));
+
+        if (enrollmentRepository.existsByStudentIdAndCourseId(studentId, courseId)) {
+            throw new RuntimeException("Student already enrolled in this course");
+        }
+
+        Enrollment enrollment = new Enrollment();
+        enrollment.setStudent(student);
+        enrollment.setCourse(course);
+
+        enrollmentRepository.save(enrollment);
+    }
+
+    public void unenrollStudent(Long studentId, Long courseId) {
+        Enrollment enrollment = enrollmentRepository.findByStudentIdAndCourseId(studentId, courseId)
+            .orElseThrow(() -> new RuntimeException("Enrollment not found"));
+        
+        enrollmentRepository.delete(enrollment);
+    }
+
+    public List<Course> getCoursesByStudentId(Long studentId) {
+        return enrollmentRepository.findByStudentId(studentId).stream()
+            .map(Enrollment::getCourse)
+            .collect(Collectors.toList());
+    }
+
+    public List<Course> getCoursesByTeacherId(Long teacherId) {
+        return courseRepository.findByTeacherId(teacherId);
+    }
+
+    public List<User> getStudentsInCourse(Course course) {
+        return enrollmentRepository.findByCourseId(course.getId()).stream()
+            .map(Enrollment::getStudent)
+            .collect(Collectors.toList());
+    }
+
+    public boolean isStudentEnrolled(Long studentId, Long courseId) {
+        return enrollmentRepository.existsByStudentIdAndCourseId(studentId, courseId);
+    }
 
     public List<Course> getAllCourses() {
-        return courseRepository.findByOrderByCodeAsc();
+        return courseRepository.findAll();
     }
 
     public List<Enrollment> getStudentEnrollments(User student) {
-        return enrollmentRepository.findByStudent(student);
-    }
-
-    @Transactional
-    public String enrollStudent(User student, Long courseId) {
-        Course course = courseRepository.findById(Objects.requireNonNull(courseId)).orElse(null);
-
-        if (course == null) {
-            return "Course not found";
-        }
-
-        // Check if already enrolled
-        if (enrollmentRepository.existsByStudentAndCourse(student, course)) {
-            return "Already enrolled in this course";
-        }
-
-        // Check capacity
-        if (course.getAvailableSeats() <= 0) {
-            return "Course is full";
-        }
-
-        Enrollment enrollment = new Enrollment(student, course);
-        enrollmentRepository.save(enrollment);
-        return "Successfully enrolled";
-    }
-
-    @Transactional
-    public String dropCourse(User student, Long courseId) {
-        Course course = courseRepository.findById(Objects.requireNonNull(courseId)).orElse(null);
-
-        if (course == null) {
-            return "Course not found";
-        }
-
-        Enrollment enrollment = enrollmentRepository.findByStudentAndCourse(student, course).orElse(null);
-
-        if (enrollment == null) {
-            return "Not enrolled in this course";
-        }
-
-        enrollment.setStatus(Enrollment.EnrollmentStatus.DROPPED);
-        enrollmentRepository.save(enrollment);
-        return "Successfully dropped course";
-    }
-
-    public boolean isStudentEnrolled(User student, Course course) {
-        return enrollmentRepository.existsByStudentAndCourse(student, course);
-    }
-
-    public Course getCourseById(Long id) {
-        return courseRepository.findById(id).orElse(null);
-    }
-
-    public List<Enrollment> getCourseEnrollments(Course course) {
-        return enrollmentRepository.findByCourse(course);
-    }
-
-    public List<Course> getCoursesByTeacher(User teacher) {
-        return courseRepository.findByTeacher(teacher);
+        return enrollmentRepository.findByStudentId(student.getId());
     }
 }

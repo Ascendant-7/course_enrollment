@@ -1,16 +1,17 @@
 package edu.itc.enrollment_scheduling_system.controller;
 
+import edu.itc.enrollment_scheduling_system.model.Classroom;
 import edu.itc.enrollment_scheduling_system.model.Course;
 import edu.itc.enrollment_scheduling_system.model.User;
+import edu.itc.enrollment_scheduling_system.repository.ClassroomRepository;
+import edu.itc.enrollment_scheduling_system.repository.CourseRepository;
 import edu.itc.enrollment_scheduling_system.repository.UserRepository;
 import edu.itc.enrollment_scheduling_system.service.EnrollmentService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -18,69 +19,202 @@ import java.util.List;
 @RequestMapping("/teacher")
 public class TeacherController {
 
-    @Autowired
-    private EnrollmentService enrollmentService;
+    private final UserRepository userRepository;
+    private final CourseRepository courseRepository;
+    private final ClassroomRepository classroomRepository;
+    private final EnrollmentService enrollmentService;
 
-    @Autowired
-    private UserRepository userRepository;
+    public TeacherController(UserRepository userRepository,
+                            CourseRepository courseRepository,
+                            ClassroomRepository classroomRepository,
+                            EnrollmentService enrollmentService) {
+        this.userRepository = userRepository;
+        this.courseRepository = courseRepository;
+        this.classroomRepository = classroomRepository;
+        this.enrollmentService = enrollmentService;
+    }
 
     @GetMapping("/dashboard")
     public String dashboard(Model model, Authentication authentication) {
         User teacher = userRepository.findByUsername(authentication.getName()).orElse(null);
-
+        
         if (teacher == null) {
             return "redirect:/login";
         }
 
-        // Get courses taught by this teacher
-        List<Course> taughtCourses = enrollmentService.getCoursesByTeacher(teacher);
+        List<Course> myCourses = courseRepository.findByTeacherId(teacher.getId());
+        List<Classroom> myClassrooms = classroomRepository.findByTeacherId(teacher.getId());
+        
+        long totalStudents = myCourses.stream()
+            .mapToLong(course -> enrollmentService.getStudentsInCourse(course).size())
+            .sum();
 
         model.addAttribute("teacher", teacher);
-        model.addAttribute("courses", taughtCourses);
+        model.addAttribute("myCourses", myCourses);
+        model.addAttribute("myClassrooms", myClassrooms);
+        model.addAttribute("totalStudents", totalStudents);
+        model.addAttribute("totalCourses", myCourses.size());
+        model.addAttribute("totalClassrooms", myClassrooms.size());
 
         return "teacher-dashboard";
     }
 
     @GetMapping("/courses")
-    public String viewCourses(Model model, @RequestParam(required = false) String search, Authentication authentication) {
+    public String viewMyCourses(Model model, Authentication authentication) {
         User teacher = userRepository.findByUsername(authentication.getName()).orElse(null);
-
+        
         if (teacher == null) {
             return "redirect:/login";
         }
 
-        List<Course> allCourses = enrollmentService.getAllCourses();
-        if (search != null && !search.trim().isEmpty()) {
-            String searchLower = search.toLowerCase();
-            allCourses = allCourses.stream()
-                .filter(course -> (course.getName() != null && course.getName().toLowerCase().contains(searchLower)) ||
-                                 (course.getCode() != null && course.getCode().toLowerCase().contains(searchLower)))
-                .toList();
-        }
-        List<Course> taughtCourses = enrollmentService.getCoursesByTeacher(teacher);
-
-        model.addAttribute("courses", allCourses);
-        model.addAttribute("taughtCourses", taughtCourses);
+        List<Course> myCourses = courseRepository.findByTeacherId(teacher.getId());
         model.addAttribute("teacher", teacher);
-        model.addAttribute("search", search);
+        model.addAttribute("courses", myCourses);
 
-        return "course-enrollment";
+        return "teacher-courses";
     }
 
-    @GetMapping("/assignments")
-    public String viewAssignments(Model model, Authentication authentication) {
+    @GetMapping("/courses/{id}")
+    public String viewCourseDetail(@PathVariable Long id, Model model, Authentication authentication) {
         User teacher = userRepository.findByUsername(authentication.getName()).orElse(null);
+        Course course = courseRepository.findById(id).orElse(null);
 
+        if (teacher == null || course == null) {
+            return "redirect:/teacher/courses";
+        }
+
+        // Check if this teacher owns this course
+        if (!course.getTeacher().getId().equals(teacher.getId())) {
+            return "redirect:/teacher/courses?error=unauthorized";
+        }
+
+        List<User> students = enrollmentService.getStudentsInCourse(course);
+
+        model.addAttribute("course", course);
+        model.addAttribute("students", students);
+        model.addAttribute("teacher", teacher);
+
+        return "teacher-course-detail";
+    }
+
+    @GetMapping("/classrooms")
+    public String viewMyClassrooms(Model model, Authentication authentication) {
+        User teacher = userRepository.findByUsername(authentication.getName()).orElse(null);
+        
         if (teacher == null) {
             return "redirect:/login";
         }
 
-        // Get courses taught by this teacher
-        List<Course> taughtCourses = enrollmentService.getCoursesByTeacher(teacher);
-
+        List<Classroom> myClassrooms = classroomRepository.findByTeacherId(teacher.getId());
         model.addAttribute("teacher", teacher);
-        model.addAttribute("courses", taughtCourses);
+        model.addAttribute("classrooms", myClassrooms);
 
-        return "teacher-assignments";
+        return "teacher-classrooms";
+    }
+
+    @GetMapping("/classrooms/create")
+    public String showCreateClassroomForm(Model model, Authentication authentication) {
+        User teacher = userRepository.findByUsername(authentication.getName()).orElse(null);
+        
+        if (teacher == null) {
+            return "redirect:/login";
+        }
+
+        List<Course> myCourses = courseRepository.findByTeacherId(teacher.getId());
+        model.addAttribute("teacher", teacher);
+        model.addAttribute("courses", myCourses);
+        model.addAttribute("classroom", new Classroom());
+
+        return "teacher-classroom-form";
+    }
+
+    @PostMapping("/classrooms/create")
+    public String createClassroom(@ModelAttribute Classroom classroom,
+                                  Authentication authentication,
+                                  RedirectAttributes redirectAttributes) {
+        User teacher = userRepository.findByUsername(authentication.getName()).orElse(null);
+        
+        if (teacher == null) {
+            return "redirect:/login";
+        }
+
+        classroom.setTeacher(teacher);
+        classroomRepository.save(classroom);
+
+        redirectAttributes.addFlashAttribute("success", "Classroom created successfully!");
+        return "redirect:/teacher/classrooms";
+    }
+
+    @GetMapping("/classrooms/{id}/edit")
+    public String showEditClassroomForm(@PathVariable Long id, Model model, Authentication authentication) {
+        User teacher = userRepository.findByUsername(authentication.getName()).orElse(null);
+        Classroom classroom = classroomRepository.findById(id).orElse(null);
+
+        if (teacher == null || classroom == null) {
+            return "redirect:/teacher/classrooms";
+        }
+
+        // Check if this teacher owns this classroom
+        if (!classroom.getTeacher().getId().equals(teacher.getId())) {
+            return "redirect:/teacher/classrooms?error=unauthorized";
+        }
+
+        List<Course> myCourses = courseRepository.findByTeacherId(teacher.getId());
+        model.addAttribute("teacher", teacher);
+        model.addAttribute("courses", myCourses);
+        model.addAttribute("classroom", classroom);
+
+        return "teacher-classroom-form";
+    }
+
+    @PostMapping("/classrooms/{id}/edit")
+    public String updateClassroom(@PathVariable Long id,
+                                  @ModelAttribute Classroom classroom,
+                                  Authentication authentication,
+                                  RedirectAttributes redirectAttributes) {
+        User teacher = userRepository.findByUsername(authentication.getName()).orElse(null);
+        Classroom existingClassroom = classroomRepository.findById(id).orElse(null);
+
+        if (teacher == null || existingClassroom == null) {
+            return "redirect:/teacher/classrooms";
+        }
+
+        // Check if this teacher owns this classroom
+        if (!existingClassroom.getTeacher().getId().equals(teacher.getId())) {
+            return "redirect:/teacher/classrooms?error=unauthorized";
+        }
+
+        existingClassroom.setName(classroom.getName());
+        existingClassroom.setBuilding(classroom.getBuilding());
+        existingClassroom.setRoomNumber(classroom.getRoomNumber());
+        existingClassroom.setCapacity(classroom.getCapacity());
+        existingClassroom.setCourse(classroom.getCourse());
+
+        classroomRepository.save(existingClassroom);
+
+        redirectAttributes.addFlashAttribute("success", "Classroom updated successfully!");
+        return "redirect:/teacher/classrooms";
+    }
+
+    @PostMapping("/classrooms/{id}/delete")
+    public String deleteClassroom(@PathVariable Long id,
+                                  Authentication authentication,
+                                  RedirectAttributes redirectAttributes) {
+        User teacher = userRepository.findByUsername(authentication.getName()).orElse(null);
+        Classroom classroom = classroomRepository.findById(id).orElse(null);
+
+        if (teacher == null || classroom == null) {
+            return "redirect:/teacher/classrooms";
+        }
+
+        // Check if this teacher owns this classroom
+        if (!classroom.getTeacher().getId().equals(teacher.getId())) {
+            return "redirect:/teacher/classrooms?error=unauthorized";
+        }
+
+        classroomRepository.delete(classroom);
+
+        redirectAttributes.addFlashAttribute("success", "Classroom deleted successfully!");
+        return "redirect:/teacher/classrooms";
     }
 }

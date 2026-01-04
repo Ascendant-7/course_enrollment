@@ -1,10 +1,10 @@
 package edu.itc.enrollment_scheduling_system.config;
 
+import edu.itc.enrollment_scheduling_system.service.DbUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -13,79 +13,64 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final RoleBasedSuccessHandler roleBasedSuccessHandler;
-    private final UserDetailsService userDetailsService;
+    private final DbUserDetailsService userDetailsService;
+    private final RoleBasedSuccessHandler successHandler;
 
-    public SecurityConfig(RoleBasedSuccessHandler roleBasedSuccessHandler, UserDetailsService userDetailsService) {
-        this.roleBasedSuccessHandler = roleBasedSuccessHandler;
+    public SecurityConfig(DbUserDetailsService userDetailsService, 
+                         RoleBasedSuccessHandler successHandler) {
         this.userDetailsService = userDetailsService;
+        this.successHandler = successHandler;
     }
 
     @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(12);
-    }
-
-    @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/",
-                    "/courses",
-                    "/courses/**",
-                    "/login",
-                    "/register",
-                    "/css/**", "/js/**", "/images/**",
-                    "/error", "/error/**",
-                    "/favicon.ico",
-                    "/h2-console/**"
-                ).permitAll()
+                // Public pages
+                .requestMatchers("/", "/home", "/index", "/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/h2-console/**").permitAll()
+                .requestMatchers("/error/**").permitAll()
+                
+                // Course browsing - allow all authenticated users and guests
+                .requestMatchers("/courses", "/courses/**").permitAll()
+                
+                // Admin only
                 .requestMatchers("/admin/**").hasRole("ADMIN")
+                
+                // Teacher only
                 .requestMatchers("/teacher/**").hasRole("TEACHER")
+                
+                // Student only
                 .requestMatchers("/student/**").hasRole("STUDENT")
+                
+                // User profile - all authenticated users
+                .requestMatchers("/user/**").authenticated()
+                
+                // All other requests require authentication
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/login")
-                .successHandler(roleBasedSuccessHandler)
-                .failureUrl("/login?error")
+                .successHandler(successHandler)
+                .failureUrl("/login?error=true")
                 .permitAll()
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
-                .clearAuthentication(true)
+                .logoutSuccessUrl("/login?logout=true")
                 .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID", "remember-me")
+                .deleteCookies("JSESSIONID")
                 .permitAll()
             )
-            .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/h2-console/**")
-            )
-            .headers(headers -> headers
-                .frameOptions(frame -> frame.sameOrigin())
-                .contentTypeOptions(cto -> {})
-                .referrerPolicy(rp -> rp.policy(org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER))
-                .contentSecurityPolicy(csp -> csp
-                    .policyDirectives("default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; script-src 'self' 'unsafe-inline'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'")
-                )
-            )
-            .sessionManagement(session -> session
-                .sessionFixation(sf -> sf.migrateSession())
-                .maximumSessions(1)
-                .maxSessionsPreventsLogin(false)
-            )
-            .rememberMe(rm -> rm
-                .key("change-me-rememberme-key")
-                .rememberMeParameter("remember-me")
-                .tokenValiditySeconds(7 * 24 * 60 * 60)
-                .userDetailsService(userDetailsService)
-            )
-            .exceptionHandling(ex -> ex
-                .accessDeniedPage("/error/403")
-            );
+            .userDetailsService(userDetailsService)
+            .csrf(csrf -> csrf.disable())
+            .headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

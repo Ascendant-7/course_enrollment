@@ -1,61 +1,78 @@
 package edu.itc.enrollment_scheduling_system.controller;
+
 import edu.itc.enrollment_scheduling_system.model.Course;
-import edu.itc.enrollment_scheduling_system.model.Enrollment;
 import edu.itc.enrollment_scheduling_system.model.User;
+import edu.itc.enrollment_scheduling_system.repository.CourseRepository;
 import edu.itc.enrollment_scheduling_system.repository.UserRepository;
 import edu.itc.enrollment_scheduling_system.service.EnrollmentService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
 @RequestMapping("/student")
 public class StudentController {
 
-    @Autowired
-    private EnrollmentService enrollmentService;
+    private final UserRepository userRepository;
+    private final CourseRepository courseRepository;
+    private final EnrollmentService enrollmentService;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @GetMapping("/dashboard")
-    public String dashboard() {
-        return "student-dashboard";
+    public StudentController(UserRepository userRepository,
+                            CourseRepository courseRepository,
+                            EnrollmentService enrollmentService) {
+        this.userRepository = userRepository;
+        this.courseRepository = courseRepository;
+        this.enrollmentService = enrollmentService;
     }
 
-    @GetMapping("/courses")
-    public String viewCourses(Model model, @RequestParam(required = false) String search, Authentication authentication) {
+    @GetMapping("/dashboard")
+    public String dashboard(Model model, Authentication authentication) {
         User student = userRepository.findByUsername(authentication.getName()).orElse(null);
         
         if (student == null) {
             return "redirect:/login";
         }
 
-        List<Course> allCourses = enrollmentService.getAllCourses();
-        if (search != null && !search.trim().isEmpty()) {
-            String searchLower = search.toLowerCase();
-            allCourses = allCourses.stream()
-                .filter(course -> (course.getName() != null && course.getName().toLowerCase().contains(searchLower)) ||
-                                 (course.getCode() != null && course.getCode().toLowerCase().contains(searchLower)))
-                .toList();
-        }
-        List<Enrollment> myEnrollments = enrollmentService.getStudentEnrollments(student);
-
-        model.addAttribute("courses", allCourses);
-        model.addAttribute("enrollments", myEnrollments);
-        model.addAttribute("student", student);
-        model.addAttribute("search", search);
+        List<Course> enrolledCourses = enrollmentService.getCoursesByStudentId(student.getId());
+        List<Course> allCourses = courseRepository.findAll();
+        List<Course> availableCourses = new ArrayList<>();
         
-        return "course-enrollment";
+        for (Course course : allCourses) {
+            if (!enrollmentService.isStudentEnrolled(student.getId(), course.getId())) {
+                availableCourses.add(course);
+            }
+        }
+
+        model.addAttribute("student", student);
+        model.addAttribute("enrolledCourses", enrolledCourses);
+        model.addAttribute("availableCourses", availableCourses);
+        model.addAttribute("totalEnrolled", enrolledCourses.size());
+
+        return "student-dashboard";
     }
 
-    @PostMapping("/enroll/{courseId}")
-    public String enrollInCourse(@PathVariable Long courseId, 
+    @GetMapping("/courses")
+    public String viewMyCourses(Model model, Authentication authentication) {
+        User student = userRepository.findByUsername(authentication.getName()).orElse(null);
+        
+        if (student == null) {
+            return "redirect:/login";
+        }
+
+        List<Course> enrolledCourses = enrollmentService.getCoursesByStudentId(student.getId());
+        model.addAttribute("student", student);
+        model.addAttribute("courses", enrolledCourses);
+
+        return "student-courses";
+    }
+
+    @PostMapping("/courses/{courseId}/enroll")
+    public String enrollInCourse(@PathVariable Long courseId,
                                  Authentication authentication,
                                  RedirectAttributes redirectAttributes) {
         User student = userRepository.findByUsername(authentication.getName()).orElse(null);
@@ -64,14 +81,18 @@ public class StudentController {
             return "redirect:/login";
         }
 
-        String message = enrollmentService.enrollStudent(student, courseId);
-        redirectAttributes.addFlashAttribute("message", message);
-        
-        return "redirect:/student/courses";
+        try {
+            enrollmentService.enrollStudent(student.getId(), courseId);
+            redirectAttributes.addFlashAttribute("success", "Successfully enrolled in course!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+
+        return "redirect:/student/dashboard";
     }
 
-    @PostMapping("/drop/{courseId}")
-    public String dropCourse(@PathVariable Long courseId, 
+    @PostMapping("/courses/{courseId}/drop")
+    public String dropCourse(@PathVariable Long courseId,
                             Authentication authentication,
                             RedirectAttributes redirectAttributes) {
         User student = userRepository.findByUsername(authentication.getName()).orElse(null);
@@ -80,9 +101,13 @@ public class StudentController {
             return "redirect:/login";
         }
 
-        String message = enrollmentService.dropCourse(student, courseId);
-        redirectAttributes.addFlashAttribute("message", message);
-        
-        return "redirect:/student/courses";
+        try {
+            enrollmentService.unenrollStudent(student.getId(), courseId);
+            redirectAttributes.addFlashAttribute("success", "Successfully dropped course!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+
+        return "redirect:/student/dashboard";
     }
 }

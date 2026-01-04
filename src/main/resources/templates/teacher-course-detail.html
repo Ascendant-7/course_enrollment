@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Course Detail</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>
+        .course-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .course-info {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        .students-list {
+            display: grid;
+            gap: 15px;
+        }
+        .student-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="course-header">
+            <div th:text="${course.code}">CS101</div>
+            <h1 th:text="${course.name}">Course Name</h1>
+        </div>
+
+        <div class="course-info">
+            <h2>Course Information</h2>
+            <p><strong>Description:</strong> <span th:text="${course.description}">Description</span></p>
+            <p><strong>Credits:</strong> <span th:text="${course.credits}">3</span></p>
+            <p><strong>Department:</strong> <span th:text="${course.department}">CS</span></p>
+        </div>
+
+        <h2>Enrolled Students (<span th:text="${#lists.size(students)}">0</span>)</h2>
+        <div class="students-list">
+            <div th:if="${#lists.isEmpty(students)}">
+                <p>No students enrolled yet.</p>
+            </div>
+            <div th:each="student : ${students}" class="student-card">
+                <div>
+                    <strong th:text="${student.fullName}">Student Name</strong><br>
+                    <small th:text="${student.email}">email@example.com</small>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <a th:href="@{/teacher/courses}" class="btn btn-secondary">← Back to My Courses</a>
+        </div>
+    </div>
+</body>
+</html>

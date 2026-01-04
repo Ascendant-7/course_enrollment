@@ -1,13 +1,13 @@
 package edu.itc.enrollment_scheduling_system.service;
 
+import edu.itc.enrollment_scheduling_system.dto.AdminCreateUserForm;
+import edu.itc.enrollment_scheduling_system.dto.RegisterForm;
 import edu.itc.enrollment_scheduling_system.model.Role;
 import edu.itc.enrollment_scheduling_system.model.User;
 import edu.itc.enrollment_scheduling_system.repository.RoleRepository;
 import edu.itc.enrollment_scheduling_system.repository.UserRepository;
-import edu.itc.enrollment_scheduling_system.dto.RegisterForm;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class RegistrationService {
@@ -16,35 +16,57 @@ public class RegistrationService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public RegistrationService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public RegistrationService(UserRepository userRepository,
+                               RoleRepository roleRepository,
+                               PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Transactional
-    public void register(RegisterForm form) {
-        if (form.getUsername() == null || form.getUsername().isBlank()) {
-            throw new IllegalArgumentException("Username is required");
+    public User registerUser(RegisterForm form) {
+        if (userRepository.findByUsername(form.getUsername()).isPresent()) {
+            throw new RuntimeException("Username already exists");
         }
-        if (userRepository.existsByUsername(form.getUsername())) {
+
+        if (userRepository.findByEmail(form.getEmail()).isPresent()) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        User user = new User();
+        user.setUsername(form.getUsername());
+        user.setEmail(form.getEmail());
+        user.setPassword(passwordEncoder.encode(form.getPassword()));
+        user.setFirstName(form.getFirstName());
+        user.setLastName(form.getLastName());
+        user.setApproved(false);
+        user.setEnabled(true);
+
+        return userRepository.save(user);
+    }
+
+    public User registerAdmin(AdminCreateUserForm form) {
+        if (userRepository.findByUsername(form.getUsername()).isPresent()) {
             throw new IllegalArgumentException("Username already exists");
         }
-        if (form.getPassword() == null || form.getPassword().isBlank()) {
-            throw new IllegalArgumentException("Password is required");
-        }
-        if (!form.getPassword().equals(form.getConfirmPassword())) {
-            throw new IllegalArgumentException("Passwords do not match");
+
+        if (userRepository.findByEmail(form.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email already exists");
         }
 
-        var studentRole = roleRepository.findByName("ROLE_STUDENT")
-                .orElseGet(() -> roleRepository.save(new Role("ROLE_STUDENT")));
+        Role role = roleRepository.findById(form.getRoleId())
+            .orElseThrow(() -> new IllegalArgumentException("Role not found"));
 
-        var user = new User();
+        User user = new User();
         user.setUsername(form.getUsername());
+        user.setEmail(form.getEmail());
         user.setPassword(passwordEncoder.encode(form.getPassword()));
-        user.getRoles().add(studentRole);
+        user.setFirstName(form.getFirstName());
+        user.setLastName(form.getLastName());
+        user.setApproved(true);
+        user.setEnabled(true);
+        user.getRoles().add(role);
 
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 }

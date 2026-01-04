@@ -8,6 +8,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
+import java.util.List;
+
 @Service
 public class UserService {
 
@@ -19,39 +21,87 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public User getUserById(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username).orElse(null);
+    }
+
+    public void saveUser(User user) {
+        userRepository.save(user);
+    }
+
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
+    }
+
+    public long countApprovedUsers() {
+        return userRepository.countByApprovedTrue();
+    }
+
     public User getCurrentUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+        
         String username = authentication.getName();
+        if (username == null || username.equals("anonymousUser")) {
+            return null;
+        }
+        
         return userRepository.findByUsername(username).orElse(null);
     }
 
     public UserProfileForm toForm(User user) {
         UserProfileForm form = new UserProfileForm();
         form.setUsername(user.getUsername());
-        form.setFullName(user.getFullName());
         form.setEmail(user.getEmail());
+        form.setFullName(user.getFullName());
         form.setBio(user.getBio());
         form.setPhone(user.getPhone());
         form.setAddress(user.getAddress());
-        form.setRoles(user.getRoles().stream().map(role -> role.getName()).toList());
-        form.setEnabled(user.isEnabled());
         return form;
     }
 
     public void changePassword(User user, UserProfileForm form, BindingResult bindingResult) {
-        // If password change requested, validate
-        boolean changingPassword = form.getNewPassword() != null && !form.getNewPassword().isBlank();
-        if (changingPassword) {
-            if (form.getOldPassword() == null || form.getOldPassword().isBlank()) {
-                bindingResult.rejectValue("oldPassword", "oldPassword.required", "Old password is required");
-            } else if (!passwordEncoder.matches(form.getOldPassword(), user.getPassword())) {
-                bindingResult.rejectValue("oldPassword", "oldPassword.invalid", "Old password is incorrect");
+        // Only attempt to change password if new password is provided
+        if (form.getNewPassword() != null && !form.getNewPassword().trim().isEmpty()) {
+            // Validate current password
+            if (form.getCurrentPassword() == null || form.getCurrentPassword().trim().isEmpty()) {
+                bindingResult.rejectValue("currentPassword", "error.currentPassword", 
+                    "Current password is required to change password");
+                return;
             }
-            if (form.getConfirmNewPassword() == null || !form.getConfirmNewPassword().equals(form.getNewPassword())) {
-                bindingResult.rejectValue("confirmNewPassword", "password.mismatch", "Passwords do not match");
-            }
-        }
 
-        if (changingPassword) {
+            // Check if current password matches
+            if (!passwordEncoder.matches(form.getCurrentPassword(), user.getPassword())) {
+                bindingResult.rejectValue("currentPassword", "error.currentPassword", 
+                    "Current password is incorrect");
+                return;
+            }
+
+            // Validate new password
+            if (form.getNewPassword().length() < 6) {
+                bindingResult.rejectValue("newPassword", "error.newPassword", 
+                    "New password must be at least 6 characters");
+                return;
+            }
+
+            // Validate password confirmation
+            if (form.getConfirmPassword() == null || 
+                !form.getNewPassword().equals(form.getConfirmPassword())) {
+                bindingResult.rejectValue("confirmPassword", "error.confirmPassword", 
+                    "Passwords do not match");
+                return;
+            }
+
+            // Update password
             user.setPassword(passwordEncoder.encode(form.getNewPassword()));
         }
     }

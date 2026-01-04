@@ -1,45 +1,48 @@
 package edu.itc.enrollment_scheduling_system.controller;
 
-import edu.itc.enrollment_scheduling_system.model.Course;
 import edu.itc.enrollment_scheduling_system.repository.CourseRepository;
-import jakarta.validation.Valid;
+import edu.itc.enrollment_scheduling_system.repository.EnrollmentRepository;
+import edu.itc.enrollment_scheduling_system.repository.UserRepository;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Objects;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
 
+    private final UserRepository userRepository;
     private final CourseRepository courseRepository;
+    private final EnrollmentRepository enrollmentRepository;
 
-    public AdminController(CourseRepository courseRepository) {
+    public AdminController(UserRepository userRepository,
+                          CourseRepository courseRepository,
+                          EnrollmentRepository enrollmentRepository) {
+        this.userRepository = userRepository;
         this.courseRepository = courseRepository;
+        this.enrollmentRepository = enrollmentRepository;
     }
 
     @GetMapping("/dashboard")
-    public String dashboard() {
-        return "admin-dashboard";
-    }
+    public String dashboard(Model model) {
+        try {
+            long totalUsers = userRepository.count();
+            long totalCourses = courseRepository.count();
+            long totalEnrollments = enrollmentRepository.count();
+            long pendingApprovals = userRepository.countByApprovedFalse();
 
-    @PostMapping("/courses/save")
-    public String saveCourse(
-            @Valid @ModelAttribute("course") Course course,
-            BindingResult result) {
+            model.addAttribute("totalUsers", totalUsers);
+            model.addAttribute("totalCourses", totalCourses);
+            model.addAttribute("totalEnrollments", totalEnrollments);
+            model.addAttribute("pendingApprovals", pendingApprovals);
 
-        // Ensure course is not null
-        Objects.requireNonNull(course, "Course must not be null");
-
-        // Check for validation errors
-        if (result.hasErrors()) {
-            return "admin/course-form";
+            return "admin-dashboard";
+        } catch (Exception e) {
+            System.err.println("Error loading admin dashboard: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("error", "Error loading dashboard: " + e.getMessage());
+            return "error/500";
         }
-
-        // Save the course
-        courseRepository.save(course);
-
-        return "redirect:/admin/courses";
     }
 }

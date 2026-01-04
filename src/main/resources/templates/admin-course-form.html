@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${courseId != null ? 'Edit Course' : 'Create Course'}">Course Form</title>
+  <style>
+    :root{--bg1:#667eea;--bg2:#764ba2;--card:#fff;--text:#111827;--border:#e5e7eb;--ring:rgba(102,126,234,.28);--danger:#b91c1c;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:linear-gradient(135deg,var(--bg1),var(--bg2));min-height:100vh;padding:24px;color:var(--text);}
+    .page{max-width:600px;margin:0 auto;background:var(--card);border-radius:14px;box-shadow:0 18px 45px rgba(17,24,39,.18);padding:24px;}
+    h1{margin:0 0 18px;color:#4f46e5;font-size:26px;}
+    .field{margin-top:14px;}
+    .label{display:block;font-size:13px;font-weight:700;color:#374151;margin-bottom:6px;}
+    .input,.textarea{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--border);outline:none;font-size:14px;background:#fff;transition:box-shadow .15s ease,border-color .15s ease;font-family:inherit;}
+    .input{height:44px;}
+    .textarea{min-height:100px;resize:vertical;}
+    .input:focus,.textarea:focus{border-color:#7c83f7;box-shadow:0 0 0 4px var(--ring);}
+    .fielderr{margin-top:6px;color:var(--danger);font-size:12.5px;}
+    .row{display:flex;gap:12px;align-items:center;margin-top:18px;}
+    .btn{border:0;border-radius:10px;padding:11px 20px;font-weight:800;color:#fff;background:linear-gradient(135deg,#667eea,#764ba2);cursor:pointer;transition:all .15s;}
+    .btn:hover{filter:brightness(1.05);transform:translateY(-1px);}
+    .link{text-decoration:none;color:#667eea;font-weight:700;padding:11px 20px;}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1 th:text="${courseId != null ? 'Edit Course' : 'Create New Course'}">Course Form</h1>
+
+    <form th:action="${courseId != null ? '/admin/courses/' + courseId + '/edit' : '/admin/courses/create'}" 
+          th:object="${form}" method="post">
+      
+      <div class="field">
+        <label class="label" for="code">Course Code</label>
+        <input class="input" id="code" type="text" th:field="*{code}" placeholder="e.g., CS101" required />
+        <div class="fielderr" th:if="${#fields.hasErrors('code')}" th:errors="*{code}"></div>
+      </div>
+
+      <div class="field">
+        <label class="label" for="name">Course Name</label>
+        <input class="input" id="name" type="text" th:field="*{name}" placeholder="e.g., Introduction to Programming" required />
+        <div class="fielderr" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+      </div>
+
+      <div class="field">
+        <label class="label" for="description">Description</label>
+        <textarea class="textarea" id="description" th:field="*{description}" placeholder="Course description..."></textarea>
+        <div class="fielderr" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+      </div>
+
+      <div class="field">
+        <label class="label" for="credits">Credits</label>
+        <input class="input" id="credits" type="number" th:field="*{credits}" min="1" max="6" required />
+        <div class="fielderr" th:if="${#fields.hasErrors('credits')}" th:errors="*{credits}"></div>
+      </div>
+
+      <div class="field">
+        <label class="label" for="maxStudents">Maximum Students</label>
+        <input class="input" id="maxStudents" type="number" th:field="*{maxStudents}" min="1" required />
+        <div class="fielderr" th:if="${#fields.hasErrors('maxStudents')}" th:errors="*{maxStudents}"></div>
+      </div>
+
+      <div class="row">
+        <button class="btn" type="submit" th:text="${courseId != null ? 'Update Course' : 'Create Course'}">Submit</button>
+        <a class="link" th:href="@{/admin/courses}">Cancel</a>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

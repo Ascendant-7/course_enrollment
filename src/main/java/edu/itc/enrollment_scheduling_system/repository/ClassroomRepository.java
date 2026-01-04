@@ -8,6 +8,6 @@ import java.util.List; // Import List Java
 @Repository
 public interface ClassroomRepository extends JpaRepository<Classroom, Long> {
     
-   
+    List<Classroom> findByTeacherId(Long teacherId);
     List<Classroom> findByCourseId(Long courseId);
 }
