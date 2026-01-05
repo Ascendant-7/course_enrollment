@@ -13,6 +13,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import org.springframework.lang.NonNull;
 
 @Controller
 @RequestMapping("/student")
@@ -38,12 +40,15 @@ public class StudentController {
             return "redirect:/login";
         }
 
-        List<Course> enrolledCourses = enrollmentService.getCoursesByStudentId(student.getId());
+        Long studentId = Objects.requireNonNull(student.getId(), "student id must not be null");
+
+        List<Course> enrolledCourses = enrollmentService.getCoursesByStudentId(studentId);
         List<Course> allCourses = courseRepository.findAll();
         List<Course> availableCourses = new ArrayList<>();
         
         for (Course course : allCourses) {
-            if (!enrollmentService.isStudentEnrolled(student.getId(), course.getId())) {
+            Long courseId = Objects.requireNonNull(course.getId(), "course id must not be null");
+            if (!enrollmentService.isStudentEnrolled(studentId, courseId)) {
                 availableCourses.add(course);
             }
         }
@@ -64,7 +69,8 @@ public class StudentController {
             return "redirect:/login";
         }
 
-        List<Course> enrolledCourses = enrollmentService.getCoursesByStudentId(student.getId());
+        Long studentId = Objects.requireNonNull(student.getId(), "student id must not be null");
+        List<Course> enrolledCourses = enrollmentService.getCoursesByStudentId(studentId);
         model.addAttribute("student", student);
         model.addAttribute("courses", enrolledCourses);
 
@@ -72,7 +78,7 @@ public class StudentController {
     }
 
     @PostMapping("/courses/{courseId}/enroll")
-    public String enrollInCourse(@PathVariable Long courseId,
+    public String enrollInCourse(@PathVariable @NonNull Long courseId,
                                  Authentication authentication,
                                  RedirectAttributes redirectAttributes) {
         User student = userRepository.findByUsername(authentication.getName()).orElse(null);
@@ -82,7 +88,8 @@ public class StudentController {
         }
 
         try {
-            enrollmentService.enrollStudent(student.getId(), courseId);
+            Long studentId = Objects.requireNonNull(student.getId(), "student id must not be null");
+            enrollmentService.enrollStudent(studentId, courseId);
             redirectAttributes.addFlashAttribute("success", "Successfully enrolled in course!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -92,7 +99,7 @@ public class StudentController {
     }
 
     @PostMapping("/courses/{courseId}/drop")
-    public String dropCourse(@PathVariable Long courseId,
+    public String dropCourse(@PathVariable @NonNull Long courseId,
                             Authentication authentication,
                             RedirectAttributes redirectAttributes) {
         User student = userRepository.findByUsername(authentication.getName()).orElse(null);
@@ -102,7 +109,8 @@ public class StudentController {
         }
 
         try {
-            enrollmentService.unenrollStudent(student.getId(), courseId);
+            Long studentId = Objects.requireNonNull(student.getId(), "student id must not be null");
+            enrollmentService.unenrollStudent(studentId, courseId);
             redirectAttributes.addFlashAttribute("success", "Successfully dropped course!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());

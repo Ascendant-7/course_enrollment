@@ -12,8 +12,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/teacher")
@@ -46,7 +48,9 @@ public class TeacherController {
         List<Classroom> myClassrooms = classroomRepository.findByTeacherId(teacher.getId());
         
         long totalStudents = myCourses.stream()
-            .mapToLong(course -> enrollmentService.getStudentsInCourse(course).size())
+            .mapToLong(course -> enrollmentService
+                .getStudentsInCourse(Objects.requireNonNull(course, "course must not be null"))
+                .size())
             .sum();
 
         model.addAttribute("teacher", teacher);
@@ -75,7 +79,7 @@ public class TeacherController {
     }
 
     @GetMapping("/courses/{id}")
-    public String viewCourseDetail(@PathVariable Long id, Model model, Authentication authentication) {
+    public String viewCourseDetail(@PathVariable @NonNull Long id, Model model, Authentication authentication) {
         User teacher = userRepository.findByUsername(authentication.getName()).orElse(null);
         Course course = courseRepository.findById(id).orElse(null);
 
@@ -146,7 +150,7 @@ public class TeacherController {
     }
 
     @GetMapping("/classrooms/{id}/edit")
-    public String showEditClassroomForm(@PathVariable Long id, Model model, Authentication authentication) {
+    public String showEditClassroomForm(@PathVariable @NonNull Long id, Model model, Authentication authentication) {
         User teacher = userRepository.findByUsername(authentication.getName()).orElse(null);
         Classroom classroom = classroomRepository.findById(id).orElse(null);
 
@@ -168,7 +172,7 @@ public class TeacherController {
     }
 
     @PostMapping("/classrooms/{id}/edit")
-    public String updateClassroom(@PathVariable Long id,
+    public String updateClassroom(@PathVariable @NonNull Long id,
                                   @ModelAttribute Classroom classroom,
                                   Authentication authentication,
                                   RedirectAttributes redirectAttributes) {
@@ -197,7 +201,7 @@ public class TeacherController {
     }
 
     @PostMapping("/classrooms/{id}/delete")
-    public String deleteClassroom(@PathVariable Long id,
+    public String deleteClassroom(@PathVariable @NonNull Long id,
                                   Authentication authentication,
                                   RedirectAttributes redirectAttributes) {
         User teacher = userRepository.findByUsername(authentication.getName()).orElse(null);

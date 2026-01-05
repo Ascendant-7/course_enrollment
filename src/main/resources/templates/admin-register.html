@@ -66,11 +66,29 @@
           <span th:text="${error}"></span>
         </div>
 
-        <form th:action="@{/admin/register}" th:object="${form}" method="post">
+        <form th:action="@{/admin/users/create}" th:object="${form}" method="post">
           <div class="field">
             <label class="label" for="username">Username</label>
             <input class="input" id="username" type="text" th:field="*{username}" required />
             <div class="fielderr" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="email">Email</label>
+            <input class="input" id="email" type="email" th:field="*{email}" required />
+            <div class="fielderr" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="firstName">First Name</label>
+            <input class="input" id="firstName" type="text" th:field="*{firstName}" required />
+            <div class="fielderr" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="lastName">Last Name</label>
+            <input class="input" id="lastName" type="text" th:field="*{lastName}" required />
+            <div class="fielderr" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
           </div>
 
           <div class="field">
@@ -86,14 +104,12 @@
           </div>
 
           <div class="field">
-            <label class="label" for="role">User Role</label>
-            <select class="select" id="role" th:field="*{role}" required>
+            <label class="label" for="roleId">User Role</label>
+            <select class="select" id="roleId" th:field="*{roleId}" required>
               <option value="">Select role...</option>
-              <option value="STUDENT">Student</option>
-              <option value="TEACHER">Teacher</option>
-              <option value="ADMIN">Admin</option>
+              <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.name}"></option>
             </select>
-            <div class="fielderr" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></div>
+            <div class="fielderr" th:if="${#fields.hasErrors('roleId')}" th:errors="*{roleId}"></div>
           </div>
 
           <button class="btn" type="submit">Create & Approve</button>

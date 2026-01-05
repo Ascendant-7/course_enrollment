@@ -10,8 +10,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/admin/approvals")
@@ -35,7 +37,7 @@ public class UserApprovalController {
     }
 
     @GetMapping("/{id}")
-    public String reviewUser(@PathVariable Long id, Model model) {
+    public String reviewUser(@PathVariable @NonNull Long id, Model model) {
         User user = userRepository.findById(id).orElse(null);
         
         if (user == null || user.isApproved()) {
@@ -54,8 +56,8 @@ public class UserApprovalController {
 
     @PostMapping("/{id}/approve")
     public String approveUser(
-            @PathVariable Long id,
-            @RequestParam("roleId") Long roleId,
+            @PathVariable @NonNull Long id,
+            @RequestParam("roleId") @NonNull Long roleId,
             @RequestParam(value = "courseIds", required = false) List<Long> courseIds,
             RedirectAttributes redirectAttributes) {
 
@@ -75,7 +77,8 @@ public class UserApprovalController {
         // If teacher role and courses selected, assign them
         if ("ROLE_TEACHER".equals(role.getName()) && courseIds != null && !courseIds.isEmpty()) {
             for (Long courseId : courseIds) {
-                Course course = courseRepository.findById(courseId).orElse(null);
+                Long nonNullCourseId = Objects.requireNonNull(courseId, "courseId must not be null");
+                Course course = courseRepository.findById(nonNullCourseId).orElse(null);
                 if (course != null) {
                     course.setTeacher(user);
                     courseRepository.save(course);
@@ -92,7 +95,7 @@ public class UserApprovalController {
     }
 
     @PostMapping("/{id}/deny")
-    public String denyUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String denyUser(@PathVariable @NonNull Long id, RedirectAttributes redirectAttributes) {
         User user = userRepository.findById(id).orElse(null);
 
         if (user == null) {

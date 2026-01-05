@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public User getUserById(Long id) {
+    public User getUserById(@NonNull Long id) {
         return userRepository.findById(id).orElse(null);
     }
 
@@ -33,11 +34,11 @@ public class UserService {
         return userRepository.findByUsername(username).orElse(null);
     }
 
-    public void saveUser(User user) {
+    public void saveUser(@NonNull User user) {
         userRepository.save(user);
     }
 
-    public void deleteUser(Long id) {
+    public void deleteUser(@NonNull Long id) {
         userRepository.deleteById(id);
     }
 
