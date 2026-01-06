@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.validation.Valid;
+import java.util.Objects;
 
 @Controller
 public class AuthController {
@@ -82,10 +83,12 @@ public class AuthController {
         boolean isTeacher = authentication.getAuthorities().stream()
             .anyMatch(auth -> auth.getAuthority().equals("ROLE_TEACHER"));
 
+        Long userId = Objects.requireNonNull(user.getId(), "user id must not be null");
+
         if (isTeacher) {
-            model.addAttribute("courses", enrollmentService.getCoursesByTeacherId(user.getId()));
+            model.addAttribute("courses", enrollmentService.getCoursesByTeacherId(userId));
         } else {
-            model.addAttribute("courses", enrollmentService.getCoursesByStudentId(user.getId()));
+            model.addAttribute("courses", enrollmentService.getCoursesByStudentId(userId));
         }
 
         model.addAttribute("user", user);

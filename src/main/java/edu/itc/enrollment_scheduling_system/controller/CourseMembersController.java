@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class CourseMembersController {
     }
 
     @GetMapping("/teachers")
-    public String viewTeachers(@PathVariable Long courseId, Model model, Authentication authentication) {
+    public String viewTeachers(@PathVariable @NonNull Long courseId, Model model, Authentication authentication) {
         Course course = courseRepository.findById(courseId).orElse(null);
 
         if (course == null) {
@@ -56,7 +57,7 @@ public class CourseMembersController {
     }
 
     @GetMapping("/students")
-    public String viewStudents(@PathVariable Long courseId, Model model, Authentication authentication) {
+    public String viewStudents(@PathVariable @NonNull Long courseId, Model model, Authentication authentication) {
         Course course = courseRepository.findById(courseId).orElse(null);
 
         if (course == null) {

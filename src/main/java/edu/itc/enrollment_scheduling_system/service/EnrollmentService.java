@@ -7,6 +7,9 @@ import edu.itc.enrollment_scheduling_system.repository.CourseRepository;
 import edu.itc.enrollment_scheduling_system.repository.EnrollmentRepository;
 import edu.itc.enrollment_scheduling_system.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.lang.NonNull;
+
+import java.util.Objects;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,7 +29,7 @@ public class EnrollmentService {
         this.userRepository = userRepository;
     }
 
-    public void enrollStudent(Long studentId, Long courseId) {
+    public void enrollStudent(@NonNull Long studentId, @NonNull Long courseId) {
         User student = userRepository.findById(studentId)
             .orElseThrow(() -> new RuntimeException("Student not found"));
         
@@ -44,30 +47,30 @@ public class EnrollmentService {
         enrollmentRepository.save(enrollment);
     }
 
-    public void unenrollStudent(Long studentId, Long courseId) {
+    public void unenrollStudent(@NonNull Long studentId, @NonNull Long courseId) {
         Enrollment enrollment = enrollmentRepository.findByStudentIdAndCourseId(studentId, courseId)
             .orElseThrow(() -> new RuntimeException("Enrollment not found"));
         
-        enrollmentRepository.delete(enrollment);
+        enrollmentRepository.delete(Objects.requireNonNull(enrollment, "enrollment must not be null"));
     }
 
-    public List<Course> getCoursesByStudentId(Long studentId) {
+    public List<Course> getCoursesByStudentId(@NonNull Long studentId) {
         return enrollmentRepository.findByStudentId(studentId).stream()
             .map(Enrollment::getCourse)
             .collect(Collectors.toList());
     }
 
-    public List<Course> getCoursesByTeacherId(Long teacherId) {
+    public List<Course> getCoursesByTeacherId(@NonNull Long teacherId) {
         return courseRepository.findByTeacherId(teacherId);
     }
 
-    public List<User> getStudentsInCourse(Course course) {
+    public List<User> getStudentsInCourse(@NonNull Course course) {
         return enrollmentRepository.findByCourseId(course.getId()).stream()
             .map(Enrollment::getStudent)
             .collect(Collectors.toList());
     }
 
-    public boolean isStudentEnrolled(Long studentId, Long courseId) {
+    public boolean isStudentEnrolled(@NonNull Long studentId, @NonNull Long courseId) {
         return enrollmentRepository.existsByStudentIdAndCourseId(studentId, courseId);
     }
 
@@ -75,7 +78,7 @@ public class EnrollmentService {
         return courseRepository.findAll();
     }
 
-    public List<Enrollment> getStudentEnrollments(User student) {
+    public List<Enrollment> getStudentEnrollments(@NonNull User student) {
         return enrollmentRepository.findByStudentId(student.getId());
     }
 }

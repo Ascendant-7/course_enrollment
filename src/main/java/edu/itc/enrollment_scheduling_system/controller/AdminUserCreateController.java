@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/admin/users")
@@ -73,8 +74,9 @@ public class AdminUserCreateController {
         }
 
         try {
+            Long roleId = Objects.requireNonNull(form.getRoleId(), "roleId must not be null");
             // Get the selected role
-            Role role = roleRepository.findById(form.getRoleId())
+            Role role = roleRepository.findById(roleId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid role selected"));
 
             // Create new user

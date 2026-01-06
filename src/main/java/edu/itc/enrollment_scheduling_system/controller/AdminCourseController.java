@@ -44,6 +44,7 @@ public class AdminCourseController {
         course.setName(form.getName());
         course.setDescription(form.getDescription());
         course.setCredits(form.getCredits());
+        course.setCapacity(form.getMaxStudents());
         course.setMaxStudents(form.getMaxStudents());
         
         courseRepository.save(course);
@@ -84,6 +85,7 @@ public class AdminCourseController {
         course.setName(form.getName());
         course.setDescription(form.getDescription());
         course.setCredits(form.getCredits());
+        course.setCapacity(form.getMaxStudents());
         course.setMaxStudents(form.getMaxStudents());
 
         courseRepository.save(course);

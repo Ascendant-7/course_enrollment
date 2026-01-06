@@ -10,6 +10,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.lang.NonNull;
+import java.util.Objects;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
@@ -147,7 +149,7 @@ public class DataInitializer implements CommandLineRunner {
             };
 
             for (Course course : sampleCourses) {
-                courseRepository.save(course);
+                courseRepository.save(Objects.requireNonNull(course, "course must not be null"));
             }
             System.out.println("✅ Sample courses created");
         }
@@ -155,7 +157,7 @@ public class DataInitializer implements CommandLineRunner {
         System.out.println("=== DATA INITIALIZER COMPLETE ===");
     }
 
-    private Course createCourse(String code, String name, String description, 
+    private @NonNull Course createCourse(String code, String name, String description, 
                                int credits, int capacity, User teacher) {
         Course course = new Course();
         course.setCode(code);

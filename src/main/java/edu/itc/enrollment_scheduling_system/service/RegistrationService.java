@@ -8,6 +8,7 @@ import edu.itc.enrollment_scheduling_system.repository.RoleRepository;
 import edu.itc.enrollment_scheduling_system.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import java.util.Objects;
 
 @Service
 public class RegistrationService {
@@ -54,7 +55,8 @@ public class RegistrationService {
             throw new IllegalArgumentException("Email already exists");
         }
 
-        Role role = roleRepository.findById(form.getRoleId())
+        Long roleId = Objects.requireNonNull(form.getRoleId(), "roleId must not be null");
+        Role role = roleRepository.findById(roleId)
             .orElseThrow(() -> new IllegalArgumentException("Role not found"));
 
         User user = new User();
