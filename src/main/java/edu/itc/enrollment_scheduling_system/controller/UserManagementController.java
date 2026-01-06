@@ -14,6 +14,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Objects;
+import org.springframework.lang.NonNull;
 
 @Controller
 @RequestMapping("/admin/users")
@@ -39,7 +41,7 @@ public class UserManagementController {
     }
 
     @GetMapping("/{id}/edit")
-    public String showEditForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String showEditForm(@PathVariable @NonNull Long id, Model model, RedirectAttributes redirectAttributes) {
         User user = userRepository.findById(id).orElse(null);
         
         if (user == null) {
@@ -72,7 +74,7 @@ public class UserManagementController {
     }
 
     @PostMapping("/{id}/edit")
-    public String updateUser(@PathVariable Long id,
+    public String updateUser(@PathVariable @NonNull Long id,
                             @Valid @ModelAttribute("form") AdminUserUpdateForm form,
                             BindingResult bindingResult,
                             Model model,
@@ -135,7 +137,8 @@ public class UserManagementController {
             }
 
             // Update role
-            Role newRole = roleRepository.findById(form.getRoleId())
+            Long roleId = Objects.requireNonNull(form.getRoleId(), "roleId must not be null");
+            Role newRole = roleRepository.findById(roleId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid role selected"));
             
             user.getRoles().clear();
@@ -156,7 +159,7 @@ public class UserManagementController {
     }
 
     @PostMapping("/{id}/toggle-status")
-    public String toggleUserStatus(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String toggleUserStatus(@PathVariable @NonNull Long id, RedirectAttributes redirectAttributes) {
         User user = userRepository.findById(id).orElse(null);
         
         if (user != null) {
@@ -174,7 +177,7 @@ public class UserManagementController {
     }
 
     @PostMapping("/{id}/delete")
-    public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String deleteUser(@PathVariable @NonNull Long id, RedirectAttributes redirectAttributes) {
         User user = userRepository.findById(id).orElse(null);
         
         if (user != null) {
