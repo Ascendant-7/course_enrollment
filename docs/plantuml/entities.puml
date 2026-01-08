@@ -1,0 +1,94 @@
+@startuml entities
+
+class User {
+    -id : Long
+    -username : String
+    -email : String
+    -firstName : String
+    -lastName : String
+    -bio : String
+    -phone : String
+    -address : String
+    -passwordHash : String
+    -createdAt : LocalDateTime
+    -updatedAt : LocalDateTime
+    -isActive : boolean
+
+    +create() : User
+    +get(data:DTO) : DTO
+    +set(data:DTO) : void
+}
+
+class Role {
+    -id : Long
+    -name : String
+}
+
+class Course {
+    -id : Long
+    -name : String
+    -code : String
+    -description : String
+    -credits : Byte
+    -capacity : Integer
+    -isActive : boolean
+
+    +get(data:DTO) : DTO
+    +set(data:DTO) : void
+}
+
+class Enrollment {
+    -userId : Long
+    -courseId : Long
+    -createdAt : LocalDateTime
+    -updatedAt : LocalDateTime
+    -status : EnrollmentStatus
+
+    +create() : Enrollment
+    +get(data:DTO) : DTO
+    +set(data:DTO) : void
+}
+
+enum EnrollmentStatus {
+    PENDING
+    ENROLLED
+    WAITLISTED
+    REJECTED
+    COMPLETED
+    FAILED
+}
+
+class Classroom {
+    id : Long
+    courseId : Long
+    teacherId : Long
+    code : String
+    startDate : LocalDate
+    endDate : LocalDate
+    createdAt : LocalDateTime
+}
+
+class Attendance {
+    studentId : Long
+    classId : Long
+    createdAt : LocalDateTime
+}
+
+class Schedule {
+    id : Long
+    weekType : WeekType
+    dayOfWeek : DayOfWeek
+    startTime : LocalTime
+    endTime : LocalTime
+}
+
+User "0..*" -- "0..*" Role : has >
+User "1" o-- "0..*" Enrollment : enrolls >
+User "1" o-- "0..*" Classroom : teaches >
+User "1" o-- "0..*" Attendance : attends >
+Course "1" o-- "0..*" Enrollment : holds >
+Course "1" o-- "0..*" Classroom : is taught in >
+Classroom "1" *-- "1..*" Schedule : schedules >
+Classroom "1" o-- "1..*" Attendance : holds >
+
+@enduml

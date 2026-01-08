@@ -1,0 +1,28 @@
+@startuml classroom-assignment
+start
+
+:student enrolls into course;
+:check for classrooms teaching this course;
+if () then ([exist])
+    :check the newest classroom;
+    if () then ([available])
+        :assign student to classroom;
+        if () then ([capacity reach 50])
+            :create new classroom;
+            :assign teacher;
+            :transfer 10 students over to new classroom;
+        else
+        endif
+    else
+        :create new classroom;
+        :assign teacher;
+        :assign student;
+    endif
+else
+    :create new classroom;
+    :assign teacher;
+    :assign student;
+endif
+
+end
+@enduml
