@@ -13,6 +13,7 @@
 ## Motives
 
 - **FLYWAY-FIRST**
+- **SIGNING-RECOMMENDED**
 
 ## Project Requirements
 
