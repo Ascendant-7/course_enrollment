@@ -10,6 +10,10 @@
 | Chi Savmoeng   | e20220753 | Member      |
 | Chhum Panha    | e20220815 | Member      |
 
+## Motives
+
+- **FLYWAY-FIRST**
+
 ## Project Requirements
 
 Our project uses the **Spring Boot Framework** as the foundation.
