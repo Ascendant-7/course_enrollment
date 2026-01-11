@@ -1,0 +1,10 @@
+CREATE TABLE classrooms (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    course_id BIGINT NOT NULL,
+    code VARCHAR(10) NOT NULL UNIQUE,
+    startDate DATE,
+    endDate DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_classroom_course FOREIGN KEY (course_id) REFERENCES courses (id)
+)

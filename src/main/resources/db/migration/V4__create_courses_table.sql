@@ -1,0 +1,9 @@
+CREATE TABLE courses (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(10) NOT NULL UNIQUE,
+    name VARCHAR(50) NOT NULL,
+    description TEXT,
+    credits TINYINT NOT NULL,
+    capacity INT NOT NULL,
+    enabled BOOLEAN NOT NULL DEFAULT TRUE
+)
