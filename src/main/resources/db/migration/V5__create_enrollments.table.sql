@@ -4,4 +4,6 @@ create table enrollments (
     course_id INT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    CONSTRAINT fk_enrollment_student FOREIGN KEY (student_id) REFERENCES students (id)
+    CONSTRAINT fk_enrollment_student FOREIGN KEY (course_id) REFERENCES courses (id)
 )

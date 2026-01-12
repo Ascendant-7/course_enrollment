@@ -1,73 +1,32 @@
 package edu.itc.enrollment_scheduling_system.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NonNull;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "enrollments")
+@Data
 public class Enrollment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(updatable = false, insertable = false)
+    private LocalDateTime createdAt;
+    @Column(updatable = false, insertable = false)
+    private LocalDateTime updatedAt;
+
+    @NonNull
     @ManyToOne
-    @JoinColumn(name = "student_id", nullable = false)
+    @JoinColumn(name = "student_id")
     private User student;
 
+    @NonNull
     @ManyToOne
-    @JoinColumn(name = "course_id", nullable = false)
+    @JoinColumn(name = "course_id")
     private Course course;
-
-    @Column(name = "enrolled_at")
-    private LocalDateTime enrolledAt;
-
-    @Column(name = "grade")
-    private String grade;
-
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public User getStudent() {
-        return student;
-    }
-
-    public void setStudent(User student) {
-        this.student = student;
-    }
-
-    public Course getCourse() {
-        return course;
-    }
-
-    public void setCourse(Course course) {
-        this.course = course;
-    }
-
-    public LocalDateTime getEnrolledAt() {
-        return enrolledAt;
-    }
-
-    public void setEnrolledAt(LocalDateTime enrolledAt) {
-        this.enrolledAt = enrolledAt;
-    }
-
-    public String getGrade() {
-        return grade;
-    }
-
-    public void setGrade(String grade) {
-        this.grade = grade;
-    }
-
-    @PrePersist
-    protected void onCreate() {
-        enrolledAt = LocalDateTime.now();
-    }
 }

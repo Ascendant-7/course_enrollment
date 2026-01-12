@@ -1,84 +1,47 @@
 package edu.itc.enrollment_scheduling_system.model;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NonNull;
 
 @Entity
 @Table(name = "classrooms")
+@Data
 public class Classroom {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String name;
+    @NonNull private String code;
+    
+    private LocalDate startDate;
+    private LocalDate endDate;
 
-    private String building;
-    private String roomNumber;
-    private Integer capacity;
+    @Column(updatable = false, insertable = false)
+    private LocalDateTime createdAt;
+    @Column(updatable = false, insertable = false)
+    private LocalDateTime updatedAt;
 
+    @NonNull
     @ManyToOne
     @JoinColumn(name = "teacher_id")
     private User teacher;
 
+    @NonNull
     @ManyToOne
     @JoinColumn(name = "course_id")
     private Course course;
 
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
+    // @OneToMany(mappedBy = "classroom")
+    // private Set<Attendance> attendances = new Set<>();
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getBuilding() {
-        return building;
-    }
-
-    public void setBuilding(String building) {
-        this.building = building;
-    }
-
-    public String getRoomNumber() {
-        return roomNumber;
-    }
-
-    public void setRoomNumber(String roomNumber) {
-        this.roomNumber = roomNumber;
-    }
-
-    public Integer getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(Integer capacity) {
-        this.capacity = capacity;
-    }
-
-    public User getTeacher() {
-        return teacher;
-    }
-
-    public void setTeacher(User teacher) {
-        this.teacher = teacher;
-    }
-
-    public Course getCourse() {
-        return course;
-    }
-
-    public void setCourse(Course course) {
-        this.course = course;
-    }
+    /*
+     * don't forget to make these functions in ClassroomRepository:
+     * - countAttendance()
+     * - isFull()
+     */
 }

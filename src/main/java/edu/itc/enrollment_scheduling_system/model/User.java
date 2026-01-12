@@ -2,6 +2,7 @@ package edu.itc.enrollment_scheduling_system.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NonNull;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -16,21 +17,24 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username;
-    private String password;
-    private String email;
-    private String firstName;
-    private String lastName;
+    @NonNull private String username;
+    @NonNull private String email;
+    @NonNull private String firstName;
+    @NonNull private String lastName;
+    @NonNull private String passwordHash;
+
     private String bio;
     private String phone;
     private String address;
-    private boolean enabled;
-    private boolean approved;
+    
+    @Column(nullable = false)
+    private Boolean enabled;
+    @Column(nullable = false)
+    private Boolean approved;
 
-    @Column(name = "created_at")
+    @Column(updatable = false, insertable = false)
     private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
+    @Column(updatable = false, insertable = false)
     private LocalDateTime updatedAt;
 
     @ManyToMany(fetch = FetchType.EAGER)
