@@ -1,6 +1,6 @@
 CREATE TABLE classrooms (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    course_id BIGINT NOT NULL,
+    course_id INT NOT NULL,
     code VARCHAR(10) NOT NULL UNIQUE,
     startDate DATE,
     endDate DATE,

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -e
+
+if [ -z "$1" ]; then
+  echo "Usage: ./flyway [clean|migrate|repair|info|validate]"
+  exit 1
+fi
+
+set -a
+source .env
+set +a
+
+./mvnw flyway:"$1" \
+  -Dflyway.url="$DB_URL" \
+  -Dflyway.user="$DB_USER" \
+  -Dflyway.password="$DB_PASS" \
+  -Dflyway.locations="$FLYWAY_LOCATIONS" \
+  -Dflyway.cleanDisabled=false
