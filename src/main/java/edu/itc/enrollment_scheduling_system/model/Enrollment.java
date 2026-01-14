@@ -15,6 +15,8 @@ public class Enrollment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NonNull private EnrollmentStatus status;
+
     @Column(updatable = false, insertable = false)
     private LocalDateTime createdAt;
     @Column(updatable = false, insertable = false)
@@ -23,7 +25,7 @@ public class Enrollment {
     @NonNull
     @ManyToOne
     @JoinColumn(name = "student_id")
-    private User student;
+    private Account student;
 
     @NonNull
     @ManyToOne

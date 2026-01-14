@@ -11,7 +11,7 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 @Data
-public class User {
+public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,30 +19,33 @@ public class User {
 
     @NonNull private String username;
     @NonNull private String email;
-    @NonNull private String firstName;
-    @NonNull private String lastName;
     @NonNull private String passwordHash;
-
-    private String bio;
-    private String phone;
-    private String address;
     
     @Column(nullable = false)
     private Boolean enabled;
     @Column(nullable = false)
     private Boolean approved;
+    @Column(nullable = false)
+    private Boolean accountNonExpired;
+    @Column(nullable = false)
+    private Boolean credentialsNonExpired;
+    @Column(nullable = false)
+    private Boolean accountNonLocked;
 
     @Column(updatable = false, insertable = false)
     private LocalDateTime createdAt;
     @Column(updatable = false, insertable = false)
     private LocalDateTime updatedAt;
 
+    @OneToOne(mappedBy = "account")
+    private Profile profile;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
     @Transient
-    public String getFullName() {
-        return firstName + " " + lastName;
+    public Boolean isActive() {
+        return enabled && approved;
     }
 }

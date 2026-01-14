@@ -29,7 +29,7 @@ public class Classroom {
     @NonNull
     @ManyToOne
     @JoinColumn(name = "teacher_id")
-    private User teacher;
+    private Account teacher;
 
     @NonNull
     @ManyToOne
