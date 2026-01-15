@@ -2,10 +2,10 @@ package edu.itc.enrollment_scheduling_system.controller;
 
 import edu.itc.enrollment_scheduling_system.model.Course;
 import edu.itc.enrollment_scheduling_system.model.Role;
-import edu.itc.enrollment_scheduling_system.model.User;
+import edu.itc.enrollment_scheduling_system.model.Account;
 import edu.itc.enrollment_scheduling_system.repository.CourseRepository;
 import edu.itc.enrollment_scheduling_system.repository.RoleRepository;
-import edu.itc.enrollment_scheduling_system.repository.UserRepository;
+import edu.itc.enrollment_scheduling_system.repository.AccountRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,26 +19,26 @@ import java.util.Objects;
 @RequestMapping("/admin/approvals")
 public class UserApprovalController {
 
-    private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
     private final RoleRepository roleRepository;
     private final CourseRepository courseRepository;
 
-    public UserApprovalController(UserRepository userRepository, RoleRepository roleRepository, CourseRepository courseRepository) {
-        this.userRepository = userRepository;
+    public UserApprovalController(AccountRepository accountRepository, RoleRepository roleRepository, CourseRepository courseRepository) {
+        this.accountRepository = accountRepository;
         this.roleRepository = roleRepository;
         this.courseRepository = courseRepository;
     }
 
     @GetMapping
     public String listPendingApprovals(Model model) {
-        List<User> pendingUsers = userRepository.findByApprovedFalse();
+        List<Account> pendingUsers = accountRepository.findByApprovedFalse();
         model.addAttribute("pendingUsers", pendingUsers);
         return "admin-approvals";
     }
 
     @GetMapping("/{id}")
     public String reviewUser(@PathVariable @NonNull Long id, Model model) {
-        User user = userRepository.findById(id).orElse(null);
+        Account user = accountRepository.findById(id).orElse(null);
         
         if (user == null || user.isApproved()) {
             return "redirect:/admin/approvals";
@@ -61,7 +61,7 @@ public class UserApprovalController {
             @RequestParam(value = "courseIds", required = false) List<Long> courseIds,
             RedirectAttributes redirectAttributes) {
 
-        User user = userRepository.findById(id).orElse(null);
+        Account user = accountRepository.findById(id).orElse(null);
         Role role = roleRepository.findById(roleId).orElse(null);
 
         if (user == null || role == null) {
@@ -86,7 +86,7 @@ public class UserApprovalController {
             }
         }
 
-        userRepository.save(user);
+        accountRepository.save(user);
 
         redirectAttributes.addFlashAttribute("success", 
             "User " + user.getUsername() + " approved successfully as " + role.getName());
@@ -96,7 +96,7 @@ public class UserApprovalController {
 
     @PostMapping("/{id}/deny")
     public String denyUser(@PathVariable @NonNull Long id, RedirectAttributes redirectAttributes) {
-        User user = userRepository.findById(id).orElse(null);
+        Account user = accountRepository.findById(id).orElse(null);
 
         if (user == null) {
             redirectAttributes.addFlashAttribute("error", "User not found");
@@ -104,7 +104,7 @@ public class UserApprovalController {
         }
 
         String username = user.getUsername();
-        userRepository.delete(user);
+        accountRepository.delete(user);
 
         redirectAttributes.addFlashAttribute("success", "User " + username + " registration denied and removed");
 

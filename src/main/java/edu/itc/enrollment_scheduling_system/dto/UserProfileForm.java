@@ -1,97 +1,38 @@
 package edu.itc.enrollment_scheduling_system.dto;
 
-import jakarta.validation.constraints.Email;
+import edu.itc.enrollment_scheduling_system.model.Profile;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
-public class UserProfileForm {
+public record UserProfileForm(
 
-    @NotBlank(message = "Username is required")
-    private String username;
+    @NotBlank(message = "First name is required")
+    @Size(max = 50, message = "First name cannot exceed 50 characters")
+    String firstName,
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Invalid email format")
-    private String email;
+    @NotBlank(message = "Last name is required")
+    @Size(max = 50, message = "Last name cannot exceed 50 characters")
+    String lastName,
 
-    private String fullName;
-    private String bio;
-    private String phone;
-    private String address;
+    @Pattern(regexp = "^(\\+\\d{1,3}[- ]?)?\\d{7,15}$", message = "Phone number must be valid")
+    String phone,
 
-    // Password change fields
-    private String currentPassword;
-    private String newPassword;
-    private String confirmPassword;
+    @Size(max = 200, message = "Bio cannot exceed 200 characters")
+    String bio,
 
-    // Getters and Setters
-    public String getUsername() {
-        return username;
-    }
+    @Size(max = 200, message = "Address cannot exceed 200 characters")
+    String address
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getBio() {
-        return bio;
-    }
-
-    public void setBio(String bio) {
-        this.bio = bio;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getCurrentPassword() {
-        return currentPassword;
-    }
-
-    public void setCurrentPassword(String currentPassword) {
-        this.currentPassword = currentPassword;
-    }
-
-    public String getNewPassword() {
-        return newPassword;
-    }
-
-    public void setNewPassword(String newPassword) {
-        this.newPassword = newPassword;
-    }
-
-    public String getConfirmPassword() {
-        return confirmPassword;
-    }
-
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
+) {
+    public UserProfileForm(Profile profile) {
+        this(
+            profile.getFirstName(),
+            profile.getLastName(),
+            profile.getPhone(),
+            profile.getBio(),
+            profile.getAddress()
+        );
     }
 }
+

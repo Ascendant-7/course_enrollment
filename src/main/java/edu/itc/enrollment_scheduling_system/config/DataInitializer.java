@@ -2,10 +2,10 @@ package edu.itc.enrollment_scheduling_system.config;
 
 import edu.itc.enrollment_scheduling_system.model.Course;
 import edu.itc.enrollment_scheduling_system.model.Role;
-import edu.itc.enrollment_scheduling_system.model.User;
+import edu.itc.enrollment_scheduling_system.model.Account;
 import edu.itc.enrollment_scheduling_system.repository.CourseRepository;
 import edu.itc.enrollment_scheduling_system.repository.RoleRepository;
-import edu.itc.enrollment_scheduling_system.repository.UserRepository;
+import edu.itc.enrollment_scheduling_system.repository.AccountRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -17,16 +17,16 @@ import java.util.Objects;
 public class DataInitializer implements CommandLineRunner {
 
     private final RoleRepository roleRepository;
-    private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
     private final PasswordEncoder encoder;
     private final CourseRepository courseRepository;
 
-    public DataInitializer(RoleRepository roleRepository, 
-                          UserRepository userRepository, 
-                          PasswordEncoder encoder, 
+    public DataInitializer(RoleRepository roleRepository,
+                          AccountRepository accountRepository,
+                          PasswordEncoder encoder,
                           CourseRepository courseRepository) {
         this.roleRepository = roleRepository;
-        this.userRepository = userRepository;
+        this.accountRepository = accountRepository;
         this.encoder = encoder;
         this.courseRepository = courseRepository;
     }
@@ -65,8 +65,8 @@ public class DataInitializer implements CommandLineRunner {
             });
 
         // Create admin user
-        if (!userRepository.existsByUsername("admin")) {
-            User admin = new User();
+        if (!accountRepository.existsByUsername("admin")) {
+            Account admin = new Account();
             admin.setUsername("admin");
             admin.setEmail("admin@example.com");
             admin.setFirstName("Admin");
@@ -76,7 +76,7 @@ public class DataInitializer implements CommandLineRunner {
             admin.setEnabled(true);
             admin.getRoles().add(adminRole);
             
-            User savedAdmin = userRepository.save(admin);
+            Account savedAdmin = accountRepository.save(admin);
             System.out.println("✅ Admin user created:");
             System.out.println("   Username: admin");
             System.out.println("   Password: admin123");
@@ -85,7 +85,7 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println("   Approved: " + savedAdmin.isApproved());
             System.out.println("   Enabled: " + savedAdmin.isEnabled());
         } else {
-            User admin = userRepository.findByUsername("admin").orElse(null);
+            Account admin = accountRepository.findByUsername("admin").orElse(null);
             System.out.println("ℹ️ Admin user already exists:");
             System.out.println("   ID: " + admin.getId());
             System.out.println("   Roles: " + admin.getRoles());
@@ -94,8 +94,8 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         // Create teacher user
-        if (!userRepository.existsByUsername("teacher")) {
-            User teacher = new User();
+        if (!accountRepository.existsByUsername("teacher")) {
+            Account teacher = new Account();
             teacher.setUsername("teacher");
             teacher.setEmail("teacher@example.com");
             teacher.setFirstName("John");
@@ -104,13 +104,13 @@ public class DataInitializer implements CommandLineRunner {
             teacher.setApproved(true);
             teacher.setEnabled(true);
             teacher.getRoles().add(teacherRole);
-            userRepository.save(teacher);
+            accountRepository.save(teacher);
             System.out.println("✅ Teacher user created: username=teacher, password=teacher123");
         }
 
         // Create student user
-        if (!userRepository.existsByUsername("student")) {
-            User student = new User();
+        if (!accountRepository.existsByUsername("student")) {
+            Account student = new Account();
             student.setUsername("student");
             student.setEmail("student@example.com");
             student.setFirstName("Jane");
@@ -119,13 +119,13 @@ public class DataInitializer implements CommandLineRunner {
             student.setApproved(true);
             student.setEnabled(true);
             student.getRoles().add(studentRole);
-            userRepository.save(student);
+            accountRepository.save(student);
             System.out.println("✅ Student user created: username=student, password=student123");
         }
 
         // Create sample courses
         if (courseRepository.count() == 0) {
-            User teacher = userRepository.findByUsername("teacher").orElse(null);
+            Account teacher = accountRepository.findByUsername("teacher").orElse(null);
 
             Course[] sampleCourses = {
                 createCourse("CS101", "Introduction to Computer Science", 
@@ -158,7 +158,7 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private @NonNull Course createCourse(String code, String name, String description, 
-                               int credits, int capacity, User teacher) {
+                               int credits, int capacity, Account teacher) {
         Course course = new Course();
         course.setCode(code);
         course.setName(name);

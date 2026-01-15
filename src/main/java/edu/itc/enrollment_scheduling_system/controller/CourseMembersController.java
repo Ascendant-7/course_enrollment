@@ -1,9 +1,9 @@
 package edu.itc.enrollment_scheduling_system.controller;
 
 import edu.itc.enrollment_scheduling_system.model.Course;
-import edu.itc.enrollment_scheduling_system.model.User;
+import edu.itc.enrollment_scheduling_system.model.Account;
 import edu.itc.enrollment_scheduling_system.repository.CourseRepository;
-import edu.itc.enrollment_scheduling_system.repository.UserRepository;
+import edu.itc.enrollment_scheduling_system.repository.AccountRepository;
 import edu.itc.enrollment_scheduling_system.service.EnrollmentService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -20,14 +20,14 @@ import java.util.List;
 public class CourseMembersController {
 
     private final CourseRepository courseRepository;
-    private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
     private final EnrollmentService enrollmentService;
 
     public CourseMembersController(CourseRepository courseRepository,
-                                  UserRepository userRepository,
+                                  AccountRepository accountRepository,
                                   EnrollmentService enrollmentService) {
         this.courseRepository = courseRepository;
-        this.userRepository = userRepository;
+        this.accountRepository = accountRepository;
         this.enrollmentService = enrollmentService;
     }
 
@@ -44,7 +44,7 @@ public class CourseMembersController {
             .anyMatch(auth -> auth.getAuthority().equals("ROLE_TEACHER"));
 
         if (isTeacher) {
-            User teacher = userRepository.findByUsername(authentication.getName()).orElse(null);
+            Account teacher = accountRepository.findByUsername(authentication.getName()).orElse(null);
             if (teacher == null || !course.getTeacher().getId().equals(teacher.getId())) {
                 return "redirect:/teacher/courses?error=unauthorized";
             }
@@ -69,13 +69,13 @@ public class CourseMembersController {
             .anyMatch(auth -> auth.getAuthority().equals("ROLE_TEACHER"));
 
         if (isTeacher) {
-            User teacher = userRepository.findByUsername(authentication.getName()).orElse(null);
+            Account teacher = accountRepository.findByUsername(authentication.getName()).orElse(null);
             if (teacher == null || !course.getTeacher().getId().equals(teacher.getId())) {
                 return "redirect:/teacher/courses?error=unauthorized";
             }
         }
 
-        List<User> students = enrollmentService.getStudentsInCourse(course);
+        List<Account> students = enrollmentService.getStudentsInCourse(course);
 
         model.addAttribute("course", course);
         model.addAttribute("students", students);

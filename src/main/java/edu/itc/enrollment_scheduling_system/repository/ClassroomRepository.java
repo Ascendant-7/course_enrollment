@@ -1,13 +1,34 @@
-package edu.itc.enrollment_scheduling_system.repository; 
+package edu.itc.enrollment_scheduling_system.repository;
 
-import edu.itc.enrollment_scheduling_system.model.Classroom; // Import Entity Classroom
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import java.util.List; // Import List Java
+
+import edu.itc.enrollment_scheduling_system.model.Classroom;
+import edu.itc.enrollment_scheduling_system.model.Course;
+import edu.itc.enrollment_scheduling_system.model.Account;
 
 @Repository
 public interface ClassroomRepository extends JpaRepository<Classroom, Long> {
     
-    List<Classroom> findByTeacherId(Long teacherId);
-    List<Classroom> findByCourseId(Long courseId);
+    @Query("""
+            SELECT c FROM Classroom c
+            WHERE (LOWER(c.code) = LOWER(:code))
+            """)
+    Optional<Classroom> findByCode(String code);
+    
+    @Query("""
+            SELECT c FROM Classroom c
+            WHERE (:teacher IS NULL OR c.teacher = :teacher)
+            AND (:course IS NULL OR c.course = :course)
+            """)
+    Page<Classroom> search(
+        Account teacher,
+        Course course,
+        Pageable pageable
+    );
 }

@@ -2,9 +2,9 @@ package edu.itc.enrollment_scheduling_system.controller;
 
 import edu.itc.enrollment_scheduling_system.dto.AdminUserUpdateForm;
 import edu.itc.enrollment_scheduling_system.model.Role;
-import edu.itc.enrollment_scheduling_system.model.User;
+import edu.itc.enrollment_scheduling_system.model.Account;
 import edu.itc.enrollment_scheduling_system.repository.RoleRepository;
-import edu.itc.enrollment_scheduling_system.repository.UserRepository;
+import edu.itc.enrollment_scheduling_system.repository.AccountRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,28 +21,28 @@ import org.springframework.lang.NonNull;
 @RequestMapping("/admin/users")
 public class UserManagementController {
 
-    private final UserRepository userRepository;
+    private final AccountRepository profileRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserManagementController(UserRepository userRepository,
+    public UserManagementController(AccountRepository profileRepository,
                                    RoleRepository roleRepository,
                                    PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
+        this.profileRepository = profileRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/management")
     public String listUsers(Model model) {
-        List<User> users = userRepository.findAll();
+        List<Account> users = profileRepository.findAll();
         model.addAttribute("users", users);
         return "user-management";
     }
 
     @GetMapping("/{id}/edit")
     public String showEditForm(@PathVariable @NonNull Long id, Model model, RedirectAttributes redirectAttributes) {
-        User user = userRepository.findById(id).orElse(null);
+        Account user = profileRepository.findById(id).orElse(null);
         
         if (user == null) {
             redirectAttributes.addFlashAttribute("error", "User not found");
@@ -80,7 +80,7 @@ public class UserManagementController {
                             Model model,
                             RedirectAttributes redirectAttributes) {
 
-        User user = userRepository.findById(id).orElse(null);
+        Account user = profileRepository.findById(id).orElse(null);
         
         if (user == null) {
             redirectAttributes.addFlashAttribute("error", "User not found");
@@ -89,14 +89,14 @@ public class UserManagementController {
 
         // Validate username uniqueness (if changed)
         if (!user.getUsername().equals(form.getUsername())) {
-            if (userRepository.findByUsername(form.getUsername()).isPresent()) {
+            if (profileRepository.findByUsername(form.getUsername()).isPresent()) {
                 bindingResult.rejectValue("username", "error.username", "Username already exists");
             }
         }
 
         // Validate email uniqueness (if changed)
         if (!user.getEmail().equals(form.getEmail())) {
-            if (userRepository.findByEmail(form.getEmail()).isPresent()) {
+            if (profileRepository.findByEmail(form.getEmail()).isPresent()) {
                 bindingResult.rejectValue("email", "error.email", "Email already exists");
             }
         }
@@ -144,7 +144,7 @@ public class UserManagementController {
             user.getRoles().clear();
             user.getRoles().add(newRole);
 
-            userRepository.save(user);
+            profileRepository.save(user);
 
             redirectAttributes.addFlashAttribute("success", 
                 "User '" + user.getUsername() + "' updated successfully!");
@@ -160,11 +160,11 @@ public class UserManagementController {
 
     @PostMapping("/{id}/toggle-status")
     public String toggleUserStatus(@PathVariable @NonNull Long id, RedirectAttributes redirectAttributes) {
-        User user = userRepository.findById(id).orElse(null);
+        Account user = profileRepository.findById(id).orElse(null);
         
         if (user != null) {
             user.setEnabled(!user.isEnabled());
-            userRepository.save(user);
+            profileRepository.save(user);
             
             String status = user.isEnabled() ? "enabled" : "disabled";
             redirectAttributes.addFlashAttribute("success", 
@@ -178,11 +178,11 @@ public class UserManagementController {
 
     @PostMapping("/{id}/delete")
     public String deleteUser(@PathVariable @NonNull Long id, RedirectAttributes redirectAttributes) {
-        User user = userRepository.findById(id).orElse(null);
+        Account user = profileRepository.findById(id).orElse(null);
         
         if (user != null) {
             String username = user.getUsername();
-            userRepository.delete(user);
+            profileRepository.delete(user);
             redirectAttributes.addFlashAttribute("success", 
                 "User '" + username + "' has been deleted");
         } else {

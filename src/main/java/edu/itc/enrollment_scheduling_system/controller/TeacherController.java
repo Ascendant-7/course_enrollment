@@ -2,10 +2,10 @@ package edu.itc.enrollment_scheduling_system.controller;
 
 import edu.itc.enrollment_scheduling_system.model.Classroom;
 import edu.itc.enrollment_scheduling_system.model.Course;
-import edu.itc.enrollment_scheduling_system.model.User;
+import edu.itc.enrollment_scheduling_system.model.Account;
 import edu.itc.enrollment_scheduling_system.repository.ClassroomRepository;
 import edu.itc.enrollment_scheduling_system.repository.CourseRepository;
-import edu.itc.enrollment_scheduling_system.repository.UserRepository;
+import edu.itc.enrollment_scheduling_system.repository.AccountRepository;
 import edu.itc.enrollment_scheduling_system.service.EnrollmentService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -21,16 +21,16 @@ import java.util.Objects;
 @RequestMapping("/teacher")
 public class TeacherController {
 
-    private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
     private final CourseRepository courseRepository;
     private final ClassroomRepository classroomRepository;
     private final EnrollmentService enrollmentService;
 
-    public TeacherController(UserRepository userRepository,
+    public TeacherController(AccountRepository accountRepository,
                             CourseRepository courseRepository,
                             ClassroomRepository classroomRepository,
                             EnrollmentService enrollmentService) {
-        this.userRepository = userRepository;
+        this.accountRepository = accountRepository;
         this.courseRepository = courseRepository;
         this.classroomRepository = classroomRepository;
         this.enrollmentService = enrollmentService;
@@ -38,7 +38,7 @@ public class TeacherController {
 
     @GetMapping("/dashboard")
     public String dashboard(Model model, Authentication authentication) {
-        User teacher = userRepository.findByUsername(authentication.getName()).orElse(null);
+        Account teacher = accountRepository.findByUsername(authentication.getName()).orElse(null);
         
         if (teacher == null) {
             return "redirect:/login";
@@ -65,7 +65,7 @@ public class TeacherController {
 
     @GetMapping("/courses")
     public String viewMyCourses(Model model, Authentication authentication) {
-        User teacher = userRepository.findByUsername(authentication.getName()).orElse(null);
+        Account teacher = accountRepository.findByUsername(authentication.getName()).orElse(null);
         
         if (teacher == null) {
             return "redirect:/login";
@@ -80,7 +80,7 @@ public class TeacherController {
 
     @GetMapping("/courses/{id}")
     public String viewCourseDetail(@PathVariable @NonNull Long id, Model model, Authentication authentication) {
-        User teacher = userRepository.findByUsername(authentication.getName()).orElse(null);
+        Account teacher = accountRepository.findByUsername(authentication.getName()).orElse(null);
         Course course = courseRepository.findById(id).orElse(null);
 
         if (teacher == null || course == null) {
@@ -92,7 +92,7 @@ public class TeacherController {
             return "redirect:/teacher/courses?error=unauthorized";
         }
 
-        List<User> students = enrollmentService.getStudentsInCourse(course);
+        List<Account> students = enrollmentService.getStudentsInCourse(course);
 
         model.addAttribute("course", course);
         model.addAttribute("students", students);
@@ -103,7 +103,7 @@ public class TeacherController {
 
     @GetMapping("/classrooms")
     public String viewMyClassrooms(Model model, Authentication authentication) {
-        User teacher = userRepository.findByUsername(authentication.getName()).orElse(null);
+        Account teacher = accountRepository.findByUsername(authentication.getName()).orElse(null);
         
         if (teacher == null) {
             return "redirect:/login";
@@ -118,7 +118,7 @@ public class TeacherController {
 
     @GetMapping("/classrooms/create")
     public String showCreateClassroomForm(Model model, Authentication authentication) {
-        User teacher = userRepository.findByUsername(authentication.getName()).orElse(null);
+        Account teacher = accountRepository.findByUsername(authentication.getName()).orElse(null);
         
         if (teacher == null) {
             return "redirect:/login";
@@ -136,7 +136,7 @@ public class TeacherController {
     public String createClassroom(@ModelAttribute Classroom classroom,
                                   Authentication authentication,
                                   RedirectAttributes redirectAttributes) {
-        User teacher = userRepository.findByUsername(authentication.getName()).orElse(null);
+        Account teacher = accountRepository.findByUsername(authentication.getName()).orElse(null);
         
         if (teacher == null) {
             return "redirect:/login";
@@ -151,7 +151,7 @@ public class TeacherController {
 
     @GetMapping("/classrooms/{id}/edit")
     public String showEditClassroomForm(@PathVariable @NonNull Long id, Model model, Authentication authentication) {
-        User teacher = userRepository.findByUsername(authentication.getName()).orElse(null);
+        Account teacher = accountRepository.findByUsername(authentication.getName()).orElse(null);
         Classroom classroom = classroomRepository.findById(id).orElse(null);
 
         if (teacher == null || classroom == null) {
@@ -176,7 +176,7 @@ public class TeacherController {
                                   @ModelAttribute Classroom classroom,
                                   Authentication authentication,
                                   RedirectAttributes redirectAttributes) {
-        User teacher = userRepository.findByUsername(authentication.getName()).orElse(null);
+        Account teacher = accountRepository.findByUsername(authentication.getName()).orElse(null);
         Classroom existingClassroom = classroomRepository.findById(id).orElse(null);
 
         if (teacher == null || existingClassroom == null) {
@@ -204,7 +204,7 @@ public class TeacherController {
     public String deleteClassroom(@PathVariable @NonNull Long id,
                                   Authentication authentication,
                                   RedirectAttributes redirectAttributes) {
-        User teacher = userRepository.findByUsername(authentication.getName()).orElse(null);
+        Account teacher = accountRepository.findByUsername(authentication.getName()).orElse(null);
         Classroom classroom = classroomRepository.findById(id).orElse(null);
 
         if (teacher == null || classroom == null) {

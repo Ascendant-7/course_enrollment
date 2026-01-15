@@ -1,9 +1,9 @@
 package edu.itc.enrollment_scheduling_system.controller;
 
 import edu.itc.enrollment_scheduling_system.model.Course;
-import edu.itc.enrollment_scheduling_system.model.User;
+import edu.itc.enrollment_scheduling_system.model.Account;
 import edu.itc.enrollment_scheduling_system.repository.CourseRepository;
-import edu.itc.enrollment_scheduling_system.repository.UserRepository;
+import edu.itc.enrollment_scheduling_system.repository.AccountRepository;
 import edu.itc.enrollment_scheduling_system.service.EnrollmentService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -20,21 +20,21 @@ import org.springframework.lang.NonNull;
 @RequestMapping("/student")
 public class StudentController {
 
-    private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
     private final CourseRepository courseRepository;
     private final EnrollmentService enrollmentService;
 
-    public StudentController(UserRepository userRepository,
+    public StudentController(AccountRepository accountRepository,
                             CourseRepository courseRepository,
                             EnrollmentService enrollmentService) {
-        this.userRepository = userRepository;
+        this.accountRepository = accountRepository;
         this.courseRepository = courseRepository;
         this.enrollmentService = enrollmentService;
     }
 
     @GetMapping("/dashboard")
     public String dashboard(Model model, Authentication authentication) {
-        User student = userRepository.findByUsername(authentication.getName()).orElse(null);
+        Account student = accountRepository.findByUsername(authentication.getName()).orElse(null);
         
         if (student == null) {
             return "redirect:/login";
@@ -63,7 +63,7 @@ public class StudentController {
 
     @GetMapping("/courses")
     public String viewMyCourses(Model model, Authentication authentication) {
-        User student = userRepository.findByUsername(authentication.getName()).orElse(null);
+        Account student = accountRepository.findByUsername(authentication.getName()).orElse(null);
         
         if (student == null) {
             return "redirect:/login";
@@ -81,7 +81,7 @@ public class StudentController {
     public String enrollInCourse(@PathVariable @NonNull Long courseId,
                                  Authentication authentication,
                                  RedirectAttributes redirectAttributes) {
-        User student = userRepository.findByUsername(authentication.getName()).orElse(null);
+        Account student = accountRepository.findByUsername(authentication.getName()).orElse(null);
         
         if (student == null) {
             return "redirect:/login";
@@ -102,7 +102,7 @@ public class StudentController {
     public String dropCourse(@PathVariable @NonNull Long courseId,
                             Authentication authentication,
                             RedirectAttributes redirectAttributes) {
-        User student = userRepository.findByUsername(authentication.getName()).orElse(null);
+        Account student = accountRepository.findByUsername(authentication.getName()).orElse(null);
         
         if (student == null) {
             return "redirect:/login";

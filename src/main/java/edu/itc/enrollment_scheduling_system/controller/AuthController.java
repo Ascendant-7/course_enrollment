@@ -1,36 +1,25 @@
 package edu.itc.enrollment_scheduling_system.controller;
 
-import edu.itc.enrollment_scheduling_system.dto.RegisterForm;
-import edu.itc.enrollment_scheduling_system.model.User;
-import edu.itc.enrollment_scheduling_system.repository.UserRepository;
-import edu.itc.enrollment_scheduling_system.service.EnrollmentService;
+import edu.itc.enrollment_scheduling_system.dto.RegistrationDTO;
 import edu.itc.enrollment_scheduling_system.service.RegistrationService;
-import org.springframework.security.core.Authentication;
+import edu.itc.enrollment_scheduling_system.util.CustomStringUtil;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
-import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 
 @Controller
+@RequiredArgsConstructor
 public class AuthController {
 
     private final RegistrationService registrationService;
-    private final EnrollmentService enrollmentService;
-    private final UserRepository userRepository;
-
-    public AuthController(RegistrationService registrationService,
-                         EnrollmentService enrollmentService,
-                         UserRepository userRepository) {
-        this.registrationService = registrationService;
-        this.enrollmentService = enrollmentService;
-        this.userRepository = userRepository;
-    }
 
     // REMOVE OR COMMENT OUT THIS METHOD - it conflicts with HomeController
     /*
@@ -47,51 +36,32 @@ public class AuthController {
 
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
-        model.addAttribute("registerForm", new RegisterForm());
+        model.addAttribute(
+            "fields",
+            CustomStringUtil.getRecordFieldNames(RegistrationDTO.class)
+        );
         return "register";
     }
 
     @PostMapping("/register")
-    public String register(@Valid @ModelAttribute RegisterForm form,
-                          BindingResult result,
-                          Model model) {
+    public String register(
+        @Valid @ModelAttribute RegistrationDTO form,
+        BindingResult result,
+        Model model,
+        RedirectAttributes redirection
+    ) {
         if (result.hasErrors()) {
+            model.addAttribute(
+                "fields",
+                CustomStringUtil.getRecordFieldNames(RegistrationDTO.class)
+            );
             return "register";
         }
-
-        try {
-            registrationService.registerUser(form);
-            model.addAttribute("success", "Registration submitted! Please wait for admin approval.");
-            model.addAttribute("registerForm", new RegisterForm());
-        } catch (Exception e) {
-            model.addAttribute("error", e.getMessage());
-        }
-
-        return "register";
-    }
-
-    @GetMapping("/my-courses")
-    public String viewCourses(Model model,
-                             @RequestParam(required = false) String role,
-                             Authentication authentication) {
-        User user = userRepository.findByUsername(authentication.getName()).orElse(null);
-
-        if (user == null) {
-            return "redirect:/login";
-        }
-
-        boolean isTeacher = authentication.getAuthorities().stream()
-            .anyMatch(auth -> auth.getAuthority().equals("ROLE_TEACHER"));
-
-        Long userId = Objects.requireNonNull(user.getId(), "user id must not be null");
-
-        if (isTeacher) {
-            model.addAttribute("courses", enrollmentService.getCoursesByTeacherId(userId));
-        } else {
-            model.addAttribute("courses", enrollmentService.getCoursesByStudentId(userId));
-        }
-
-        model.addAttribute("user", user);
-        return "my-courses";
+        registrationService.registerUser(form);
+        redirection.addAttribute(
+            "successMessage",
+            "account registered! please wait for admin to approve!"
+        );
+        return "redirect:/waiting-room";
     }
 }
