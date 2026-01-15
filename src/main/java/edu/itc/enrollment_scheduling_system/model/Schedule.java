@@ -6,15 +6,15 @@ import java.time.LocalTime;
 
 @Entity
 @Table(name = "schedules")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Data
 public class Schedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String dayOfWeek; 
-    private LocalTime startTime; 
-    private LocalTime endTime;   
+    private String dayOfWeek;
+    private LocalTime startTime;
+    private LocalTime endTime;
 
     @ManyToOne
     @JoinColumn(name = "classroom_id")

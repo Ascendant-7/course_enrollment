@@ -1,5 +1,8 @@
 package edu.itc.enrollment_scheduling_system.model;
 
+import java.util.Objects;
+
+import edu.itc.enrollment_scheduling_system.dto.UserProfileForm;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -29,8 +32,22 @@ public class Profile {
     @JoinColumn(name = "id")
     private Account account;
 
+    public Profile(String firstName, String lastName, Account account) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.account = account;
+    }
+
     @Transient
     public String getFullName() {
         return firstName + " " + lastName;
+    }
+    
+    public void update(UserProfileForm form) {
+        if (!Objects.equals(this.firstName, form.firstName())) this.firstName = form.firstName();
+        if (!Objects.equals(this.lastName, form.lastName())) this.lastName = form.lastName();
+        if (!Objects.equals(this.bio, form.bio())) this.bio = form.bio();
+        if (!Objects.equals(this.phone, form.phone())) this.phone = form.phone();
+        if (!Objects.equals(this.address, form.address())) this.address = form.address();
     }
 }

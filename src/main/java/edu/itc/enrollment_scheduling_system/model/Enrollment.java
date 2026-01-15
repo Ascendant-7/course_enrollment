@@ -15,7 +15,7 @@ public class Enrollment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NonNull private EnrollmentStatus status;
+    private EnrollmentStatus status;
 
     @Column(updatable = false, insertable = false)
     private LocalDateTime createdAt;
