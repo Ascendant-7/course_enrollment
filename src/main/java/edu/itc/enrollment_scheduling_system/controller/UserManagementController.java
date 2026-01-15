@@ -11,7 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+import org.springframework.security.access.prepost.PreAuthorize;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Objects;
@@ -34,6 +34,7 @@ public class UserManagementController {
     }
 
     @GetMapping("/management")
+    @PreAuthorize("hasPermission('USER_MANAGE')")
     public String listUsers(Model model) {
         List<User> users = userRepository.findAll();
         model.addAttribute("users", users);
@@ -41,6 +42,7 @@ public class UserManagementController {
     }
 
     @GetMapping("/{id}/edit")
+    @PreAuthorize("hasPermission('USER_MANAGE')")
     public String showEditForm(@PathVariable @NonNull Long id, Model model, RedirectAttributes redirectAttributes) {
         User user = userRepository.findById(id).orElse(null);
         
@@ -74,6 +76,7 @@ public class UserManagementController {
     }
 
     @PostMapping("/{id}/edit")
+    @PreAuthorize("hasPermission('USER_MANAGE')")
     public String updateUser(@PathVariable @NonNull Long id,
                             @Valid @ModelAttribute("form") AdminUserUpdateForm form,
                             BindingResult bindingResult,

@@ -3,6 +3,7 @@ package edu.itc.enrollment_scheduling_system.controller;
 import edu.itc.enrollment_scheduling_system.repository.CourseRepository;
 import edu.itc.enrollment_scheduling_system.repository.EnrollmentRepository;
 import edu.itc.enrollment_scheduling_system.repository.UserRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +26,7 @@ public class AdminController {
     }
 
     @GetMapping("/dashboard")
+    @PreAuthorize("hasPermission('REPORT_VIEW')")
     public String dashboard(Model model) {
         try {
             long totalUsers = userRepository.count();

@@ -10,8 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-@Controller
+import org.springframework.security.access.prepost.PreAuthorize;
 @RequestMapping("/admin/courses")
 public class AdminCourseController {
 
@@ -22,18 +21,21 @@ public class AdminCourseController {
     }
 
     @GetMapping
+    @PreAuthorize("hasPermission('COURSE_MANAGE')")
     public String listCourses(Model model) {
         model.addAttribute("courses", courseRepository.findAll());
         return "admin-courses";
     }
 
     @GetMapping("/create")
+    @PreAuthorize("hasPermission('COURSE_MANAGE')")
     public String createForm(Model model) {
         model.addAttribute("form", new CourseForm());
         return "admin-course-form";
     }
 
     @PostMapping("/create")
+    @PreAuthorize("hasPermission('COURSE_MANAGE')")
     public String createSubmit(@Valid @ModelAttribute("form") CourseForm form,
                               BindingResult result,
                               RedirectAttributes redirectAttributes) {

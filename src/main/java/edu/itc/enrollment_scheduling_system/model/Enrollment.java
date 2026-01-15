@@ -29,4 +29,13 @@ public class Enrollment {
     @ManyToOne
     @JoinColumn(name = "course_id")
     private Course course;
+
+    // No-arg constructor for JPA
+    public Enrollment() {}
+
+    // Constructor for required fields
+    public Enrollment(User student, Course course) {
+        this.student = student;
+        this.course = course;
+    }
 }
