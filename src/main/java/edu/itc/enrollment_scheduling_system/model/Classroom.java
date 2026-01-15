@@ -17,6 +17,10 @@ public class Classroom {
     private Long id;
 
     @NonNull private String code;
+    private String name;
+    private String building;
+    private String roomNumber;
+    private Integer capacity;
     
     private LocalDate startDate;
     private LocalDate endDate;
@@ -35,6 +39,16 @@ public class Classroom {
     @ManyToOne
     @JoinColumn(name = "course_id")
     private Course course;
+
+    // No-arg constructor for JPA
+    public Classroom() {}
+
+    // Constructor for required fields
+    public Classroom(String code, User teacher, Course course) {
+        this.code = code;
+        this.teacher = teacher;
+        this.course = course;
+    }
 
     // @OneToMany(mappedBy = "classroom")
     // private Set<Attendance> attendances = new Set<>();
