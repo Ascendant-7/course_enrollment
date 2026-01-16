@@ -1,0 +1,10 @@
+#!/bin/bash
+
+i=1
+for f in src/main/resources/db/migration/*create*.sql; do
+    filename=$(basename "$f") # get the filename
+    name="${filename#*__*__*__}" # remove the existing version prefix
+    echo $name
+    mv -- "$f" "src/main/resources/db/migration/V${i}__${name}"
+    ((i++))
+done

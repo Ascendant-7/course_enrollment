@@ -1,4 +1,4 @@
-package edu.itc.enrollment_scheduling_system.config;
+package edu.itc.enrollment_scheduling_system.security;
 
 import edu.itc.enrollment_scheduling_system.model.Course;
 import edu.itc.enrollment_scheduling_system.model.Role;

@@ -2,7 +2,7 @@ package edu.itc.enrollment_scheduling_system.controller;
 
 import edu.itc.enrollment_scheduling_system.dto.PasswordChangeForm;
 import edu.itc.enrollment_scheduling_system.dto.UserProfileForm;
-import edu.itc.enrollment_scheduling_system.model.Account;
+import edu.itc.enrollment_scheduling_system.security.AccountDetails;
 import edu.itc.enrollment_scheduling_system.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,19 +25,19 @@ public class ProfileController {
 
     @GetMapping("/")
     public String profile(
-        @AuthenticationPrincipal Account account,
+        @AuthenticationPrincipal AccountDetails accountDetails,
         Model model
     ) {
         model.addAttribute(
             "form",
-            new UserProfileForm(account.getProfile())
+            new UserProfileForm(accountDetails.getAccount().getProfile())
         );
         return "profile";
     }
 
     @GetMapping("/change-password")
     public String getChangePasswordForm(
-        @AuthenticationPrincipal Account account,
+        @AuthenticationPrincipal AccountDetails accountDetails,
         @ModelAttribute PasswordChangeForm form
     ) { return "change-password"; }
 
@@ -45,12 +45,12 @@ public class ProfileController {
     public String changePassword(
         @Valid @ModelAttribute PasswordChangeForm form,
         BindingResult result,
-        @AuthenticationPrincipal Account account,
+        @AuthenticationPrincipal AccountDetails accountDetails,
         RedirectAttributes redirection
     ) {
         if (result.hasErrors()) return "change-password";
 
-        userService.changePassword(form, account, result);
+        userService.changePassword(form, accountDetails.getAccount(), result);
         redirection.addFlashAttribute(
             "successMessage",
             "Password changed successfully!"
@@ -60,19 +60,19 @@ public class ProfileController {
 
     @GetMapping("/edit")
     public String showEditForm(
-        @AuthenticationPrincipal Account account,
+        @AuthenticationPrincipal AccountDetails accountDetails,
         Model model
     ) {
         model.addAttribute(
             "form",
-            new UserProfileForm(account.getProfile())
+            new UserProfileForm(accountDetails.getAccount().getProfile())
         );
         return "profile-edit";
     }
 
     @PostMapping("/edit")
     public String updateProfile(
-        @AuthenticationPrincipal Account account,
+        @AuthenticationPrincipal AccountDetails accountDetails,
         @Valid @ModelAttribute("form") UserProfileForm form,
         BindingResult bindingResult,
         Model model,
@@ -82,7 +82,7 @@ public class ProfileController {
             return "profile-edit";
         }
 
-        account.getProfile().update(form);
+        accountDetails.getAccount().getProfile().update(form);
         redirection.addFlashAttribute(
             "successMessage",
             "Profile changed successfully!"

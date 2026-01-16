@@ -1,6 +1,6 @@
 package edu.itc.enrollment_scheduling_system.service;
 
-import edu.itc.enrollment_scheduling_system.dto.RegisterForm;
+import edu.itc.enrollment_scheduling_system.dto.RegistrationDTO;
 import edu.itc.enrollment_scheduling_system.model.Account;
 import lombok.RequiredArgsConstructor;
 import edu.itc.enrollment_scheduling_system.repository.AccountRepository;
@@ -17,7 +17,7 @@ public class RegistrationService {
     private final PasswordEncoder passwordEncoder;
 
     @PreAuthorize("hasRole('GUEST')")
-    public void registerUser(RegisterForm form) {
+    public void registerUser(RegistrationDTO form) {
         if (accountRepository.findByUsername(form.username()).isPresent()) {
             throw new RuntimeException("Username already exists");
         }

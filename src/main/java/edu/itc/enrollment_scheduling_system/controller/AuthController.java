@@ -21,14 +21,6 @@ public class AuthController {
 
     private final RegistrationService registrationService;
 
-    // REMOVE OR COMMENT OUT THIS METHOD - it conflicts with HomeController
-    /*
-    @GetMapping("/")
-    public String home() {
-        return "index";
-    }
-    */
-
     @GetMapping("/login")
     public String login() {
         return "login";

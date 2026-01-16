@@ -1,121 +1,44 @@
 package edu.itc.enrollment_scheduling_system.controller;
 
-import edu.itc.enrollment_scheduling_system.model.Course;
+import edu.itc.enrollment_scheduling_system.model.Enrollment;
 import edu.itc.enrollment_scheduling_system.model.Account;
-import edu.itc.enrollment_scheduling_system.repository.CourseRepository;
-import edu.itc.enrollment_scheduling_system.repository.AccountRepository;
-import edu.itc.enrollment_scheduling_system.service.EnrollmentService;
-import org.springframework.security.core.Authentication;
+import edu.itc.enrollment_scheduling_system.repository.EnrollmentRepository;
+import edu.itc.enrollment_scheduling_system.security.AccountDetails;
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import org.springframework.lang.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 @Controller
 @RequestMapping("/student")
+@RequiredArgsConstructor
 public class StudentController {
 
-    private final AccountRepository accountRepository;
-    private final CourseRepository courseRepository;
-    private final EnrollmentService enrollmentService;
-
-    public StudentController(AccountRepository accountRepository,
-                            CourseRepository courseRepository,
-                            EnrollmentService enrollmentService) {
-        this.accountRepository = accountRepository;
-        this.courseRepository = courseRepository;
-        this.enrollmentService = enrollmentService;
-    }
+    private final EnrollmentRepository enrollmentRepository;
 
     @GetMapping("/dashboard")
-    public String dashboard(Model model, Authentication authentication) {
-        Account student = accountRepository.findByUsername(authentication.getName()).orElse(null);
-        
-        if (student == null) {
-            return "redirect:/login";
-        }
+    public String dashboard(
+        Model model,
+        @AuthenticationPrincipal AccountDetails accountDetails,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
+    ) {
+        Account student = accountDetails.getAccount();
 
-        Long studentId = Objects.requireNonNull(student.getId(), "student id must not be null");
-
-        List<Course> enrolledCourses = enrollmentService.getCoursesByStudentId(studentId);
-        List<Course> allCourses = courseRepository.findAll();
-        List<Course> availableCourses = new ArrayList<>();
-        
-        for (Course course : allCourses) {
-            Long courseId = Objects.requireNonNull(course.getId(), "course id must not be null");
-            if (!enrollmentService.isStudentEnrolled(studentId, courseId)) {
-                availableCourses.add(course);
-            }
-        }
+        Page<Enrollment> enrollments = 
+        enrollmentRepository.search(student, null, PageRequest.of(page, size));
 
         model.addAttribute("student", student);
-        model.addAttribute("enrolledCourses", enrolledCourses);
-        model.addAttribute("availableCourses", availableCourses);
-        model.addAttribute("totalEnrolled", enrolledCourses.size());
+        model.addAttribute("enrollments", enrollments);
 
         return "student-dashboard";
     }
 
-    @GetMapping("/courses")
-    public String viewMyCourses(Model model, Authentication authentication) {
-        Account student = accountRepository.findByUsername(authentication.getName()).orElse(null);
-        
-        if (student == null) {
-            return "redirect:/login";
-        }
+    
 
-        Long studentId = Objects.requireNonNull(student.getId(), "student id must not be null");
-        List<Course> enrolledCourses = enrollmentService.getCoursesByStudentId(studentId);
-        model.addAttribute("student", student);
-        model.addAttribute("courses", enrolledCourses);
-
-        return "student-courses";
-    }
-
-    @PostMapping("/courses/{courseId}/enroll")
-    public String enrollInCourse(@PathVariable @NonNull Long courseId,
-                                 Authentication authentication,
-                                 RedirectAttributes redirectAttributes) {
-        Account student = accountRepository.findByUsername(authentication.getName()).orElse(null);
-        
-        if (student == null) {
-            return "redirect:/login";
-        }
-
-        try {
-            Long studentId = Objects.requireNonNull(student.getId(), "student id must not be null");
-            enrollmentService.enrollStudent(studentId, courseId);
-            redirectAttributes.addFlashAttribute("success", "Successfully enrolled in course!");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-        }
-
-        return "redirect:/student/dashboard";
-    }
-
-    @PostMapping("/courses/{courseId}/drop")
-    public String dropCourse(@PathVariable @NonNull Long courseId,
-                            Authentication authentication,
-                            RedirectAttributes redirectAttributes) {
-        Account student = accountRepository.findByUsername(authentication.getName()).orElse(null);
-        
-        if (student == null) {
-            return "redirect:/login";
-        }
-
-        try {
-            Long studentId = Objects.requireNonNull(student.getId(), "student id must not be null");
-            enrollmentService.unenrollStudent(studentId, courseId);
-            redirectAttributes.addFlashAttribute("success", "Successfully dropped course!");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-        }
-
-        return "redirect:/student/dashboard";
-    }
+    
 }

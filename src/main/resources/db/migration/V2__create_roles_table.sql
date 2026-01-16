@@ -1,5 +1,0 @@
--- Active: 1761750070668@@127.0.0.1@3306@course_enrollment
-CREATE TABLE roles (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(10) NOT NULL UNIQUE
-)

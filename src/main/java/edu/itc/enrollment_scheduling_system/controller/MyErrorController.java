@@ -4,37 +4,18 @@ import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@RequestMapping("/error")
 public class MyErrorController implements ErrorController {
 
-    @RequestMapping("/error")
-    public String handleError(HttpServletRequest request) {
+    @RequestMapping
+    public String handleError(HttpServletRequest request, Model model) {
         Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
-
-        if (status != null) {
-            Integer statusCode = Integer.valueOf(status.toString());
-
-            if (statusCode == 404) {
-                return "error/404";
-            } else if (statusCode == 403) {
-                return "error/403";
-            } else if (statusCode == 500) {
-                return "error/500";
-            }
-        }
-        return "error/500"; 
-    }
-
-    
-    @RequestMapping("/test403")
-    public String test403() {
-        return "error/403"; 
-    }
-
-    @RequestMapping("/test500")
-    public String test500() {
-        return "error/500"; 
+        Integer statusCode = status != null ? Integer.valueOf(status.toString()) : 500;
+        model.addAttribute("status", statusCode);
+        return "error";
     }
 }

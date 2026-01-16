@@ -30,7 +30,7 @@ public class EnrollmentService {
     @PreAuthorize("hasRole('STUDENT')")
     public void dropCourse(Account student, Course course) {
 
-        enrollmentRepository.findByStudentAndCourse(student, course)
+        enrollmentRepository.search(student, course)
             .ifPresentOrElse(
                 enrollmentRepository::delete,
                 () -> { throw new RuntimeException("Enrollment not found"); }

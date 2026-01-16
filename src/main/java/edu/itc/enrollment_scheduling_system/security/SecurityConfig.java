@@ -1,6 +1,6 @@
-package edu.itc.enrollment_scheduling_system.config;
+package edu.itc.enrollment_scheduling_system.security;
 
-import edu.itc.enrollment_scheduling_system.service.DbUserDetailsService;
+import edu.itc.enrollment_scheduling_system.service.AccountDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,10 +13,10 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final DbUserDetailsService userDetailsService;
+    private final AccountDetailsService userDetailsService;
     private final RoleBasedSuccessHandler successHandler;
 
-    public SecurityConfig(DbUserDetailsService userDetailsService, 
+    public SecurityConfig(AccountDetailsService userDetailsService, 
                          RoleBasedSuccessHandler successHandler) {
         this.userDetailsService = userDetailsService;
         this.successHandler = successHandler;

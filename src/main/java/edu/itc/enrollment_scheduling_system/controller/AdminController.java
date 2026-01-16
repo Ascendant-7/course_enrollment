@@ -2,119 +2,114 @@ package edu.itc.enrollment_scheduling_system.controller;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import edu.itc.enrollment_scheduling_system.dto.CourseForm;
+import edu.itc.enrollment_scheduling_system.model.Account;
 import edu.itc.enrollment_scheduling_system.model.Course;
+import edu.itc.enrollment_scheduling_system.model.Role;
+import edu.itc.enrollment_scheduling_system.repository.AccountRepository;
 import edu.itc.enrollment_scheduling_system.repository.CourseRepository;
-import jakarta.validation.Valid;
+import edu.itc.enrollment_scheduling_system.repository.RoleRepository;
+import edu.itc.enrollment_scheduling_system.security.AccountDetails;
 
 @Controller
-@RequestMapping("/admin-dashboard")
+@RequestMapping("/admin")
 @RequiredArgsConstructor
 public class AdminController {
 
+    private final AccountRepository accountRepository;
     private final CourseRepository courseRepository;
+    private final RoleRepository roleRepository;
 
-    @GetMapping("/")
-    public String dashboard(Model model) {
-        try {
+    @GetMapping("/dashboard")
+    public String dashboard(
+        Model model,
+        @AuthenticationPrincipal AccountDetails accountDetails,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<Account> pendingUsersPage = accountRepository.findByApprovedFalse(
+            PageRequest.of(page, size)
+        );
 
-            // TODO: add more
-            return "admin-dashboard";
-        } catch (Exception e) {
-            System.err.println("Error loading admin dashboard: " + e.getMessage());
-            e.printStackTrace();
-            model.addAttribute("error", "Error loading dashboard: " + e.getMessage());
-            return "error/500";
+        model.addAttribute("pendingUsers", pendingUsersPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", pendingUsersPage.getTotalPages());
+
+        return "admin-dashboard";
+    }
+
+    @PostMapping("/approvals/{id}/approve")
+    public String approveUser(
+        @PathVariable @NonNull Long id,
+        @RequestParam("roleId") @NonNull Long roleId,
+        @RequestParam(value = "courseIds", required = false) List<Long> courseIds,
+        RedirectAttributes redirectAttributes
+    ) {
+        Account user = accountRepository.findById(id).orElse(null);
+        Role role = roleRepository.findById(roleId).orElse(null);
+
+        if (user == null || role == null) {
+            redirectAttributes.addFlashAttribute("error", "User or role not found");
+            return "redirect:/admin/dashboard";
         }
+
+        // Approve user and assign role
+        user.setApproved(true);
+        user.getRoles().clear();
+        user.getRoles().add(role);
+
+        // If teacher role and courses selected, assign them
+        if ("ROLE_TEACHER".equals(role.getName()) && courseIds != null && !courseIds.isEmpty()) {
+            for (Long courseId : courseIds) {
+                Long nonNullCourseId = Objects.requireNonNull(courseId, "courseId must not be null");
+                Course course = courseRepository.findById(nonNullCourseId).orElse(null);
+                if (course != null) {
+                    course.setTeacher(user);
+                    courseRepository.save(course);
+                }
+            }
+        }
+
+        accountRepository.save(user);
+
+        redirectAttributes.addFlashAttribute("success", 
+            "User " + user.getUsername() + " approved successfully as " + role.getName());
+
+        return "redirect:/admin/dashboard";
     }
 
-    @GetMapping("/create-course")
-    public String createForm() {
-        return "create-course"; // TODO: add more
-    }
-
-    @PostMapping("/create-course")
-    public String createSubmit(
-        @Valid @ModelAttribute("form") CourseForm form,
-        BindingResult result,
+    @PostMapping("/approvals/{id}/deny")
+    public String denyUser(
+        @PathVariable @NonNull Long id,
         RedirectAttributes redirectAttributes
     ) {
-        if (result.hasErrors()) return "create-course";
+        Account user = accountRepository.findById(id).orElse(null);
 
-        courseRepository.save(new Course(form));
-        redirectAttributes.addFlashAttribute(
-            "successMessage",
-            "Course created successfully"
-        );
-        return "redirect:/admin-dashboard";
+        if (user == null) {
+            redirectAttributes.addFlashAttribute("error", "User not found");
+            return "redirect:/admin/dashboard";
+        }
+
+        String username = user.getUsername();
+        accountRepository.delete(user);
+
+        redirectAttributes.addFlashAttribute("success", "User " + username + " registration denied and removed");
+
+        return "redirect:/admin/dashboard";
     }
-
-    @GetMapping("/edit-course/{id}")
-    public String editForm(
-        @PathVariable @NonNull Integer id,
-        Model model
-    ) {
-        Course course = courseRepository.findById(id)
-            .orElseThrow(
-                () -> new IllegalArgumentException("Course not found!")
-            );
-
-        model.addAttribute("form", new CourseForm(course));
-        model.addAttribute("courseId", id);
-        return "edit-course";
-    }
-
-    @PostMapping("/edit-course/{id}")
-    public String editSubmit(
-        @PathVariable @NonNull Integer id,
-        @Valid @ModelAttribute("form") CourseForm form,
-        BindingResult result,
-        RedirectAttributes redirectAttributes
-    ) {
-        if (result.hasErrors()) return "edit-course";
-
-        Course course = courseRepository.findById(id)
-            .orElseThrow(
-                () -> new IllegalArgumentException("Course not found!")
-            );
-
-        course.update(form);
-        redirectAttributes.addFlashAttribute(
-            "successMessage",
-            "Course updated successfully"
-        );
-        return "redirect:/admin-dashboard";
-    }
-
-    @PostMapping("/delete-course/{id}")
-    public String delete(
-        @PathVariable @NonNull Integer id,
-        RedirectAttributes redirectAttributes
-    ) {
-        Course course = courseRepository.findById(id)
-            .orElseThrow(
-                () -> new IllegalArgumentException("Course not found")
-            );
-
-        String courseName = course.getName();
-        courseRepository.delete(course);
-        
-        redirectAttributes.addFlashAttribute(
-            "successMessage",
-            "Course '" + courseName + "' deleted successfully"
-        );
-        return "redirect:/admin-dashboard";
-    }
-
 }
