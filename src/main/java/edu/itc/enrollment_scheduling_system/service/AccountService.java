@@ -8,6 +8,8 @@ import edu.itc.enrollment_scheduling_system.repository.AccountRepository;
 import edu.itc.enrollment_scheduling_system.util.StringNormalizer;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Objects;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,13 +22,15 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public void createUser(RegistrationDTO form) {
+    public String createUser(RegistrationDTO form) {
+        if (accountRepository.existsByEmail(form.email())) {
+            return "This email already exists. Unable to create new user.";
+        }
         Account account = new Account(
             form.username(),
             form.email(),
             passwordEncoder.encode(form.password())
         );
-
         accountRepository.save(account);
 
         Profile profile = new Profile(
@@ -34,10 +38,8 @@ public class AccountService {
             form.lastName(),
             account
         );
-
-        System.out.println("\n\n\nprofile's id: "+profile.getAccountId()+"\n\n\n");
-
         account.setProfile(profile);
+        return "user created successfully.";
     }
 
     public Account getCurrentUser(Authentication authentication) {
@@ -81,5 +83,21 @@ public class AccountService {
         }
 
         account.setPasswordHash(passwordEncoder.encode(form.newPassword()));
+    }
+
+    // dev-only
+    public void deleteUser(String email) {
+
+        accountRepository
+        .findByEmail(email)
+        .ifPresentOrElse(
+            account -> {
+                accountRepository.delete(
+                    Objects.requireNonNull(account)
+                );
+                System.out.println("user deleted successfully.");
+            },
+            () -> { System.out.println("unable to delete user."); }
+        );
     }
 }

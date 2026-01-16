@@ -11,6 +11,8 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import org.hibernate.annotations.DynamicInsert;
+
 import edu.itc.enrollment_scheduling_system.dto.CreateUpdateCourseDTO;
 
 @Entity
@@ -18,13 +20,14 @@ import edu.itc.enrollment_scheduling_system.dto.CreateUpdateCourseDTO;
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @RequiredArgsConstructor
+@DynamicInsert
 public class Course {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NonNull private String code;
+    @NonNull @Column(unique = true) private String code;
     @NonNull private String name;
     @NonNull private Integer credits;
     @NonNull private Integer capacity;

@@ -24,17 +24,17 @@ public class Account {
     private Long id;
 
     @NonNull private String username;
-    @NonNull private String email;
+    @NonNull @Column(unique = true) private String email;
     @NonNull private String passwordHash;
     
     @Enumerated(EnumType.STRING)
     private Role role;
     
-    private Boolean enabled;
-    private Boolean approved;
-    private Boolean accountNonExpired;
-    private Boolean credentialsNonExpired;
-    private Boolean accountNonLocked;
+    private Boolean enabled = true;
+    private Boolean approved = false;
+    private Boolean accountNonExpired = true;
+    private Boolean credentialsNonExpired = true;
+    private Boolean accountNonLocked = true;
 
     @Column(updatable = false, insertable = false)
     private LocalDateTime createdAt;

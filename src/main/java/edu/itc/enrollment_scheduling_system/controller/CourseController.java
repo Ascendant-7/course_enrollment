@@ -44,7 +44,7 @@ public class CourseController {
         model.addAttribute("courses", coursePage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", coursePage.getTotalPages());
-        return "course-list";
+        return "course/list";
     }
 
     @GetMapping("/{id}/enroll")
@@ -87,7 +87,7 @@ public class CourseController {
 
     @GetMapping("/create-course")
     public String createForm() {
-        return "course/form"; // TODO: add more
+        return "course/form";
     }
 
     @PostMapping("/create-course")
