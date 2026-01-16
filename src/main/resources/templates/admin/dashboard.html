@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Course Enrollment System</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎓 Admin Dashboard</h1>
+            <div class="header-actions">
+                <a th:href="@{/courses/create-course}" class="btn btn-primary">+ Create Course</a>
+                <a th:href="@{/courses}" class="btn btn-primary">Manage Courses</a>
+                <a th:href="@{/user/profile}" class="btn btn-primary">My Profile</a>
+                <a th:href="@{/logout}" class="btn btn-danger">Logout</a>
+            </div>
+        </div>
+
+        <!-- Flash Messages -->
+        <div th:if="${success}" class="alert alert-success">
+            <span th:text="${success}"></span>
+            <button onclick="this.parentElement.style.display='none'" class="btn" style="background:none; color:inherit; padding:0; font-size:20px;">×</button>
+        </div>
+        <div th:if="${error}" class="alert alert-error">
+            <span th:text="${error}"></span>
+            <button onclick="this.parentElement.style.display='none'" class="btn" style="background:none; color:inherit; padding:0; font-size:20px;">×</button>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-section">
+            <h2>📊 Overview</h2>
+            <div class="stat-card">
+                <div class="label">Pending Approvals</div>
+                <div class="value" th:text="${pendingUserCount}">0</div>
+            </div>
+        </div>
+
+        <!-- Pending Users Section -->
+        <div class="pending-section">
+            <h2>👥 Pending User Approvals</h2>
+
+            <div th:if="${#lists.isEmpty(pendingUsers)}" class="empty-state">
+                <p>✓ No pending approvals at this time</p>
+            </div>
+
+            <div th:if="${!#lists.isEmpty(pendingUsers)}" class="user-list">
+                <div th:each="user : ${pendingUsers}" class="user-row">
+                    <div class="user-info">
+                        <h3 th:text="${user.username}">Username</h3>
+                        <p th:text="${user.email}">email@example.com</p>
+                        <p th:if="${user.profile}" th:text="${user.profile.firstName + ' ' + user.profile.lastName}">Full Name</p>
+                        <p style="font-size: 12px; color: #999;" th:text="${#temporals.format(user.createdAt, 'MMM dd, yyyy HH:mm')}">Registration Date</p>
+                    </div>
+                    <div class="user-actions">
+                        <button class="btn btn-primary" th:data-user-id="${user.id}" th:onclick="'openUserModal(' + ${user.id} + ')'">View Details</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div th:if="${totalPages > 1}" class="pagination">
+                <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+                   th:href="@{/admin/dashboard(page=${i})}"
+                   class="btn btn-secondary"
+                   th:classappend="${i == currentPage} ? 'active' : ''"
+                   th:text="${i + 1}">1</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Details Modal -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>User Details & Approval</h2>
+                <button class="modal-close" onclick="closeUserModal()">×</button>
+            </div>
+
+            <div class="modal-body">
+                <!-- User Info Section -->
+                <div class="modal-body-section">
+                    <h3>Personal Information</h3>
+                    <div class="info-row">
+                        <div class="info-label">Username</div>
+                        <div class="info-value" id="modal-username">-</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Email</div>
+                        <div class="info-value" id="modal-email">-</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Full Name</div>
+                        <div class="info-value" id="modal-fullname">-</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Registration Date</div>
+                        <div class="info-value" id="modal-regdate">-</div>
+                    </div>
+                </div>
+
+                <!-- Role Assignment Section -->
+                <div class="modal-body-section">
+                    <h3>Assignment</h3>
+                    <form id="approveForm" method="post">
+                        <div class="form-group">
+                            <label for="roleSelect">Assign Role *</label>
+                            <select id="roleSelect" name="role" required>
+                                <option value="">-- Select Role --</option>
+                                <option th:each="role : ${allRoles}" 
+                                        th:value="${role}" 
+                                        th:text="${role}">ADMIN</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeUserModal()">Cancel</button>
+                <form id="denyForm" method="post" style="display:inline;" onsubmit="return confirm('Deny this registration? The user will be removed.')">
+                    <button type="submit" class="btn btn-danger">Deny</button>
+                </form>
+                <button type="submit" form="approveForm" class="btn btn-success">Approve</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUserId = null;
+        const userData = {};
+
+        // Extract and store user data from the DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            const userRows = document.querySelectorAll('.user-row');
+            userRows.forEach((row) => {
+                const username = row.querySelector('.user-info h3').textContent;
+                const email = row.querySelector('.user-info p').textContent;
+                const fullnameElem = row.querySelectorAll('.user-info p')[1];
+                const regdateElem = row.querySelectorAll('.user-info p')[2];
+                const fullname = fullnameElem ? fullnameElem.textContent : '-';
+                const regdate = regdateElem ? regdateElem.textContent : '-';
+                const userId = row.querySelector('.btn').getAttribute('th:data-user-id') || 
+                               row.querySelector('.btn').getAttribute('data-user-id');
+                
+                userData[userId] = {
+                    username: username,
+                    email: email,
+                    fullname: fullname,
+                    regdate: regdate
+                };
+            });
+        });
+
+        function openUserModal(userId) {
+            currentUserId = userId;
+            const user = userData[userId];
+            
+            if (!user) {
+                // Fallback: extract from button
+                const btn = document.querySelector(`[data-user-id="${userId}"]`);
+                if (btn) {
+                    const row = btn.closest('.user-row');
+                    const username = row.querySelector('.user-info h3').textContent;
+                    const email = row.querySelector('.user-info p').textContent;
+                    const fullnameElem = row.querySelectorAll('.user-info p')[1];
+                    const regdateElem = row.querySelectorAll('.user-info p')[2];
+                    userData[userId] = {
+                        username: username,
+                        email: email,
+                        fullname: fullnameElem ? fullnameElem.textContent : '-',
+                        regdate: regdateElem ? regdateElem.textContent : '-'
+                    };
+                }
+            }
+            
+            const userData_for_display = userData[userId] || {};
+            document.getElementById('modal-username').textContent = userData_for_display.username || '-';
+            document.getElementById('modal-email').textContent = userData_for_display.email || '-';
+            document.getElementById('modal-fullname').textContent = userData_for_display.fullname || '-';
+            document.getElementById('modal-regdate').textContent = userData_for_display.regdate || '-';
+
+            // Update form actions with correct user ID
+            document.getElementById('approveForm').action = `/admin/approvals/${userId}/approve`;
+            document.getElementById('denyForm').action = `/admin/approvals/${userId}/deny`;
+
+            document.getElementById('userModal').classList.add('show');
+        }
+
+        function closeUserModal() {
+            document.getElementById('userModal').classList.remove('show');
+            currentUserId = null;
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('userModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeUserModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeUserModal();
+            }
+        });
+    </script>

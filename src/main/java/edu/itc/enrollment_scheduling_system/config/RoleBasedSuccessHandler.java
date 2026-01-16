@@ -1,4 +1,4 @@
-package edu.itc.enrollment_scheduling_system.security;
+package edu.itc.enrollment_scheduling_system.config;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

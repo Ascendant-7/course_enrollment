@@ -1,8 +1,8 @@
 package edu.itc.enrollment_scheduling_system.service;
 
+import edu.itc.enrollment_scheduling_system.config.AccountDetails;
 import edu.itc.enrollment_scheduling_system.model.Account;
 import edu.itc.enrollment_scheduling_system.repository.AccountRepository;
-import edu.itc.enrollment_scheduling_system.security.AccountDetails;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.core.userdetails.UserDetails;

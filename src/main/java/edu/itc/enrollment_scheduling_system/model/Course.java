@@ -1,23 +1,28 @@
 package edu.itc.enrollment_scheduling_system.model;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import edu.itc.enrollment_scheduling_system.dto.CourseForm;
+import edu.itc.enrollment_scheduling_system.dto.CreateUpdateCourseDTO;
 
 @Entity
 @Table(name = "courses")
 @Data
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@RequiredArgsConstructor
 public class Course {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @NonNull private String code;
     @NonNull private String name;
@@ -26,13 +31,12 @@ public class Course {
 
     private String description;
 
-    @Column(nullable = false)
     private Boolean enabled;
 
     @OneToMany(mappedBy = "course")
     private Set<Enrollment> enrollments = new HashSet<>();
 
-    public Course(CourseForm form) {
+    public Course(CreateUpdateCourseDTO form) {
         this.code = form.code();
         this.name = form.name();
         this.credits = form.credits();
@@ -40,7 +44,7 @@ public class Course {
         this.description = form.description();
     }
 
-    public void update(CourseForm form) {
+    public void update(CreateUpdateCourseDTO form) {
         if (!Objects.equals(this.code, form.code()))
             this.code = form.code();
 

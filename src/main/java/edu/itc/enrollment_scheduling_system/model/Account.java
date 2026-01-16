@@ -5,17 +5,18 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
-import edu.itc.enrollment_scheduling_system.dto.RegistrationDTO;
+import org.hibernate.annotations.DynamicInsert;
 
 @Entity
-@Table(name = "users")
+@Table(name = "accounts")
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@RequiredArgsConstructor
+@DynamicInsert
 public class Account {
 
     @Id
@@ -26,15 +27,13 @@ public class Account {
     @NonNull private String email;
     @NonNull private String passwordHash;
     
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role;
+    
     private Boolean enabled;
-    @Column(nullable = false)
     private Boolean approved;
-    @Column(nullable = false)
     private Boolean accountNonExpired;
-    @Column(nullable = false)
     private Boolean credentialsNonExpired;
-    @Column(nullable = false)
     private Boolean accountNonLocked;
 
     @Column(updatable = false, insertable = false)
@@ -42,22 +41,20 @@ public class Account {
     @Column(updatable = false, insertable = false)
     private LocalDateTime updatedAt;
 
-    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(
+        mappedBy = "account",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
     private Profile profile;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles = new HashSet<>();
-
-    public Account(RegistrationDTO form, String passwordHash) {
-        this.username = form.username();
-        this.email = form.email();
-        this.passwordHash = passwordHash;
-        this.profile = new Profile(form.firstName(), form.lastName(), this);
-    }
 
     @Transient
     public Boolean isActive() {
-        return enabled && approved;
+        return Boolean.TRUE.equals(enabled) && Boolean.TRUE.equals(approved);
+    }
+
+    public void grant(Role role) {
+        this.approved = true;
+        this.role = role;
     }
 }

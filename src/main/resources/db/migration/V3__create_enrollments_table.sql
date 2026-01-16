@@ -4,7 +4,7 @@ create table enrollments (
     course_id INT NOT NULL,
     status ENUM("PENDING", "ENROLLED", "REJECTED", "WAITLISTED", "PASSED", "FAILED", "DROPPED") DEFAULT "PENDING",
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    CONSTRAINT fk_enrollment_student FOREIGN KEY (student_id) REFERENCES students (id)
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_enrollment_student FOREIGN KEY (student_id) REFERENCES accounts (id),
     CONSTRAINT fk_enrollment_course FOREIGN KEY (course_id) REFERENCES courses (id)
 )

@@ -2,7 +2,6 @@ package edu.itc.enrollment_scheduling_system.controller;
 
 import edu.itc.enrollment_scheduling_system.dto.RegistrationDTO;
 import edu.itc.enrollment_scheduling_system.service.RegistrationService;
-import edu.itc.enrollment_scheduling_system.util.CustomStringUtil;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,37 +22,31 @@ public class AuthController {
 
     @GetMapping("/login")
     public String login() {
-        return "login";
+        return "auth/login";
     }
 
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
-        model.addAttribute(
-            "fields",
-            CustomStringUtil.getRecordFieldNames(RegistrationDTO.class)
-        );
-        return "register";
+        model.addAttribute("registerForm", new RegistrationDTO("", "", "", "", ""));
+        return "auth/register";
     }
 
     @PostMapping("/register")
     public String register(
-        @Valid @ModelAttribute RegistrationDTO form,
+        @Valid @ModelAttribute("registerForm") RegistrationDTO form,
         BindingResult result,
         Model model,
         RedirectAttributes redirection
     ) {
         if (result.hasErrors()) {
-            model.addAttribute(
-                "fields",
-                CustomStringUtil.getRecordFieldNames(RegistrationDTO.class)
-            );
-            return "register";
+            return "auth/register";
         }
+        
         registrationService.registerUser(form);
-        redirection.addAttribute(
-            "successMessage",
-            "account registered! please wait for admin to approve!"
+        redirection.addFlashAttribute(
+            "success",
+            "Account registered! Please wait for admin approval before logging in."
         );
-        return "redirect:/waiting-room";
+        return "redirect:/login";
     }
 }

@@ -28,9 +28,12 @@ public class EnrollmentService {
 
     @Transactional
     @PreAuthorize("hasRole('STUDENT')")
-    public void dropCourse(Account student, Course course) {
+    public void dropCourse(
+        Account student,
+        Course course
+    ) {
 
-        enrollmentRepository.search(student, course)
+        enrollmentRepository.findByStudentAndCourse(student, course)
             .ifPresentOrElse(
                 enrollmentRepository::delete,
                 () -> { throw new RuntimeException("Enrollment not found"); }

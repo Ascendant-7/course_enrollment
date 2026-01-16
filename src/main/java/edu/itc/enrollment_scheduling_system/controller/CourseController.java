@@ -1,10 +1,10 @@
 package edu.itc.enrollment_scheduling_system.controller;
 
-import edu.itc.enrollment_scheduling_system.dto.CourseForm;
+import edu.itc.enrollment_scheduling_system.config.AccountDetails;
+import edu.itc.enrollment_scheduling_system.dto.CreateUpdateCourseDTO;
 import edu.itc.enrollment_scheduling_system.model.Account;
 import edu.itc.enrollment_scheduling_system.model.Course;
 import edu.itc.enrollment_scheduling_system.repository.CourseRepository;
-import edu.itc.enrollment_scheduling_system.security.AccountDetails;
 import edu.itc.enrollment_scheduling_system.service.EnrollmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -87,16 +87,16 @@ public class CourseController {
 
     @GetMapping("/create-course")
     public String createForm() {
-        return "create-course"; // TODO: add more
+        return "course/form"; // TODO: add more
     }
 
     @PostMapping("/create-course")
     public String createSubmit(
-        @Valid @ModelAttribute("form") CourseForm form,
+        @Valid @ModelAttribute("form") CreateUpdateCourseDTO form,
         BindingResult result,
         RedirectAttributes redirectAttributes
     ) {
-        if (result.hasErrors()) return "create-course";
+        if (result.hasErrors()) return "course/form";
 
         courseRepository.save(new Course(form));
         redirectAttributes.addFlashAttribute(
@@ -116,19 +116,19 @@ public class CourseController {
                 () -> new IllegalArgumentException("Course not found!")
             );
 
-        model.addAttribute("form", new CourseForm(course));
+        model.addAttribute("form", new CreateUpdateCourseDTO(course));
         model.addAttribute("courseId", id);
-        return "edit-course";
+        return "course/form";
     }
 
     @PostMapping("/edit-course/{id}")
     public String editSubmit(
         @PathVariable @NonNull Integer id,
-        @Valid @ModelAttribute("form") CourseForm form,
+        @Valid @ModelAttribute("form") CreateUpdateCourseDTO form,
         BindingResult result,
         RedirectAttributes redirectAttributes
     ) {
-        if (result.hasErrors()) return "edit-course";
+        if (result.hasErrors()) return "course/form";
 
         Course course = courseRepository.findById(id)
             .orElseThrow(

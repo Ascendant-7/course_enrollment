@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public record UserProfileForm(
+public record UpdateProfileDTO(
 
     @NotBlank(message = "First name is required")
     @Size(max = 50, message = "First name cannot exceed 50 characters")
@@ -24,8 +24,9 @@ public record UserProfileForm(
     @Size(max = 200, message = "Address cannot exceed 200 characters")
     String address
 
-) {
-    public UserProfileForm(Profile profile) {
+) implements Updatable<Profile> {
+    
+    public UpdateProfileDTO(Profile profile) {
         this(
             profile.getFirstName(),
             profile.getLastName(),
@@ -34,5 +35,9 @@ public record UserProfileForm(
             profile.getAddress()
         );
     }
+    
+    @Override
+    public void applyTo(Profile profile) {
+        profile.update(this);
+    }
 }
-

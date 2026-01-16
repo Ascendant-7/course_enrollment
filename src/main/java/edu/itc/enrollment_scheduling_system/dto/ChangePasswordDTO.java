@@ -3,7 +3,7 @@ package edu.itc.enrollment_scheduling_system.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public record PasswordChangeForm(
+public record ChangePasswordDTO(
     @NotBlank(message = "Current password is required")
     String currentPassword,
 

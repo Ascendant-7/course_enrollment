@@ -1,9 +1,9 @@
 package edu.itc.enrollment_scheduling_system.controller;
 
-import edu.itc.enrollment_scheduling_system.dto.PasswordChangeForm;
-import edu.itc.enrollment_scheduling_system.dto.UserProfileForm;
-import edu.itc.enrollment_scheduling_system.security.AccountDetails;
-import edu.itc.enrollment_scheduling_system.service.UserService;
+import edu.itc.enrollment_scheduling_system.config.AccountDetails;
+import edu.itc.enrollment_scheduling_system.dto.ChangePasswordDTO;
+import edu.itc.enrollment_scheduling_system.dto.UpdateProfileDTO;
+import edu.itc.enrollment_scheduling_system.service.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -21,7 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequiredArgsConstructor
 @RequestMapping("/profile")
 public class ProfileController {
-    private final UserService userService;
+    private final AccountService userService;
 
     @GetMapping("/")
     public String profile(
@@ -30,25 +30,25 @@ public class ProfileController {
     ) {
         model.addAttribute(
             "form",
-            new UserProfileForm(accountDetails.getAccount().getProfile())
+            new UpdateProfileDTO(accountDetails.getAccount().getProfile())
         );
-        return "profile";
+        return "user/profile";
     }
 
     @GetMapping("/change-password")
     public String getChangePasswordForm(
         @AuthenticationPrincipal AccountDetails accountDetails,
-        @ModelAttribute PasswordChangeForm form
-    ) { return "change-password"; }
+        @ModelAttribute ChangePasswordDTO form
+    ) { return "user/change-password"; }
 
     @PostMapping("/change-password")
     public String changePassword(
-        @Valid @ModelAttribute PasswordChangeForm form,
+        @Valid @ModelAttribute ChangePasswordDTO form,
         BindingResult result,
         @AuthenticationPrincipal AccountDetails accountDetails,
         RedirectAttributes redirection
     ) {
-        if (result.hasErrors()) return "change-password";
+        if (result.hasErrors()) return "user/change-password";
 
         userService.changePassword(form, accountDetails.getAccount(), result);
         redirection.addFlashAttribute(
@@ -65,21 +65,21 @@ public class ProfileController {
     ) {
         model.addAttribute(
             "form",
-            new UserProfileForm(accountDetails.getAccount().getProfile())
+            new UpdateProfileDTO(accountDetails.getAccount().getProfile())
         );
-        return "profile-edit";
+        return "user/edit";
     }
 
     @PostMapping("/edit")
     public String updateProfile(
         @AuthenticationPrincipal AccountDetails accountDetails,
-        @Valid @ModelAttribute("form") UserProfileForm form,
+        @Valid @ModelAttribute("form") UpdateProfileDTO form,
         BindingResult bindingResult,
         Model model,
         RedirectAttributes redirection
     ) {
         if (bindingResult.hasErrors()) {
-            return "profile-edit";
+            return "user/edit";
         }
 
         accountDetails.getAccount().getProfile().update(form);

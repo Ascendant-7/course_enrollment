@@ -1,11 +1,11 @@
 package edu.itc.enrollment_scheduling_system.controller;
 
+import edu.itc.enrollment_scheduling_system.config.AccountDetails;
 import edu.itc.enrollment_scheduling_system.model.Account;
 import edu.itc.enrollment_scheduling_system.model.Classroom;
 import edu.itc.enrollment_scheduling_system.model.Schedule;
 import edu.itc.enrollment_scheduling_system.repository.ClassroomRepository;
 import edu.itc.enrollment_scheduling_system.repository.ScheduleRepository;
-import edu.itc.enrollment_scheduling_system.security.AccountDetails;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -72,7 +72,7 @@ public class ClassroomController {
         model.addAttribute("teacher", teacher);
         model.addAttribute("classroom", classroom);
 
-        return "teacher-classroom-form";
+        return "teacher/classroom-form";
     }
 
     @PostMapping("/{id}/edit")

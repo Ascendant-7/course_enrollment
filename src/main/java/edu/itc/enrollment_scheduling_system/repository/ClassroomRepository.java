@@ -6,13 +6,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
 import edu.itc.enrollment_scheduling_system.model.Classroom;
 import edu.itc.enrollment_scheduling_system.model.Course;
 import edu.itc.enrollment_scheduling_system.model.Account;
 
-@Repository
 public interface ClassroomRepository extends JpaRepository<Classroom, Long> {
     
     @Query("""

@@ -738,9 +738,430 @@ body {
     text-align: center;
 }
 
+/* Error Page Styles */
+.error-container {
+    background: white;
+    padding: 50px;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+}
+
+.error-code {
+    font-size: 80px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    letter-spacing: 2px;
+}
+
+.error-code.error-403 { color: #ff9800; }
+.error-code.error-404 { color: #f44336; }
+.error-code.error-500 { color: #dc3545; }
+
+.error-container h1 {
+    color: #333;
+    margin: 15px 0;
+    font-size: 28px;
+}
+
+.error-container p {
+    color: #666;
+    margin: 20px 0;
+    line-height: 1.6;
+    font-size: 16px;
+}
+
+.error-details {
+    background: #f5f5f5;
+    color: #333;
+    padding: 15px;
+    border-radius: 5px;
+    margin: 20px 0;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    text-align: left;
+    border-left: 4px solid #667eea;
+    word-break: break-word;
+}
+
+.error-details strong {
+    display: block;
+    margin-bottom: 8px;
+    color: #667eea;
+}
+
+.error-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.error-actions .btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.error-actions .btn-primary:hover {
+    background: #5568d3;
+    transform: translateY(-2px);
+}
+
+.error-actions .btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.error-actions .btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
 /* Dashboard Body for Vertical Centering */
 .dashboard-body {
     display: flex;
     align-items: center;
     justify-content: center;
+}/* Admin Dashboard Styles - to be added to main.css */
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5568d3;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #218838;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.alert {
+    padding: 15px 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.stats-section {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.stats-section h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 22px;
+    border-bottom: 2px solid #667eea;
+    padding-bottom: 10px;
+}
+
+.stat-card {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px 30px;
+    border-radius: 8px;
+    margin-right: 20px;
+}
+
+.stat-card .label {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.stat-card .value {
+    font-size: 32px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.pending-section {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.pending-section h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 22px;
+    border-bottom: 2px solid #667eea;
+    padding-bottom: 10px;
+}
+
+.user-list {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.user-row {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.user-info {
+    flex: 1;
+}
+
+.user-info h3 {
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.user-info p {
+    color: #666;
+    font-size: 14px;
+    margin: 3px 0;
+}
+
+.user-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.user-actions .btn {
+    padding: 8px 16px;
+    font-size: 13px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+}
+
+.empty-state p {
+    font-size: 18px;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 0;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+.modal-body-section {
+    margin-bottom: 25px;
+}
+
+.modal-body-section h3 {
+    color: #333;
+    margin-bottom: 12px;
+    font-size: 16px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 8px;
+}
+
+.info-row {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 15px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.info-label {
+    color: #666;
+    font-weight: 600;
+}
+
+.info-value {
+    color: #333;
+    word-break: break-all;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.modal-footer {
+    padding: 20px;
+    background: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.modal-footer .btn {
+    margin: 0;
+}
+
+.pagination {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.pagination .btn {
+    padding: 8px 12px;
+    font-size: 13px;
+}
+
+.pagination .btn.active {
+    background: #667eea;
+    color: white;
+}
+
+/* Error Page Body Centering */
+.error-page-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.error-page-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Override error-actions button styles to use standard btn classes */
+.error-actions a {
+    display: inline-block;
+    padding: 12px 30px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
 }

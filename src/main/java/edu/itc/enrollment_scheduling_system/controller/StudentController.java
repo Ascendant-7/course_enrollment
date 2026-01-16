@@ -1,9 +1,9 @@
 package edu.itc.enrollment_scheduling_system.controller;
 
 import edu.itc.enrollment_scheduling_system.model.Enrollment;
+import edu.itc.enrollment_scheduling_system.config.AccountDetails;
 import edu.itc.enrollment_scheduling_system.model.Account;
 import edu.itc.enrollment_scheduling_system.repository.EnrollmentRepository;
-import edu.itc.enrollment_scheduling_system.security.AccountDetails;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -29,13 +29,13 @@ public class StudentController {
     ) {
         Account student = accountDetails.getAccount();
 
-        Page<Enrollment> enrollments = 
-        enrollmentRepository.search(student, null, PageRequest.of(page, size));
+        Page<Enrollment> enrollments =
+        enrollmentRepository.findByStudent(student, PageRequest.of(page, size));
 
         model.addAttribute("student", student);
         model.addAttribute("enrollments", enrollments);
 
-        return "student-dashboard";
+        return "student/dashboard";
     }
 
     

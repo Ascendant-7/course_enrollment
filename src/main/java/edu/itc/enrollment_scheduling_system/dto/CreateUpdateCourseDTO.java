@@ -3,7 +3,7 @@ package edu.itc.enrollment_scheduling_system.dto;
 import edu.itc.enrollment_scheduling_system.model.Course;
 import jakarta.validation.constraints.*;
 
-public record CourseForm (
+public record CreateUpdateCourseDTO (
 
     @NotBlank(message = "Course code is required")
     @Size(max = 10, message = "Course code must not exceed 10 characters")
@@ -24,8 +24,9 @@ public record CourseForm (
     @NotNull(message = "capacity is required")
     @Min(value = 1, message = "Max students must be at least 1")
     Integer capacity
-) {
-    public CourseForm(Course course) {
+) implements Updatable<Course> {
+    
+    public CreateUpdateCourseDTO(Course course) {
         this(
             course.getCode(),
             course.getName(),
@@ -33,5 +34,10 @@ public record CourseForm (
             course.getCredits(),
             course.getCapacity()
         );
+    }
+    
+    @Override
+    public void applyTo(Course course) {
+        course.update(this);
     }
 }

@@ -1,9 +1,9 @@
 package edu.itc.enrollment_scheduling_system.controller;
 
+import edu.itc.enrollment_scheduling_system.config.AccountDetails;
 import edu.itc.enrollment_scheduling_system.model.Account;
 import edu.itc.enrollment_scheduling_system.model.Classroom;
 import edu.itc.enrollment_scheduling_system.repository.ClassroomRepository;
-import edu.itc.enrollment_scheduling_system.security.AccountDetails;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -41,6 +41,6 @@ public class TeacherController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", classroomsPage.getTotalPages());
 
-        return "teacher-dashboard";
+        return "teacher/dashboard";
     }
 }

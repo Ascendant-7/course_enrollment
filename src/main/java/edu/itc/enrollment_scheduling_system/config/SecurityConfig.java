@@ -1,4 +1,4 @@
-package edu.itc.enrollment_scheduling_system.security;
+package edu.itc.enrollment_scheduling_system.config;
 
 import edu.itc.enrollment_scheduling_system.service.AccountDetailsService;
 import org.springframework.context.annotation.Bean;
@@ -23,17 +23,27 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http)
+        throws Exception
+    {
         http
             .authorizeHttpRequests(auth -> auth
                 // Public pages
-                .requestMatchers("/", "/home", "/index", "/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
-                .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/error/**").permitAll()
-                
-                // Course browsing - allow all authenticated users and guests
-                .requestMatchers("/courses", "/courses/**").permitAll()
-                
+                .requestMatchers(
+                    "/",
+                    "/home",
+                    "/index",
+                    "/login",
+                    "/register",
+                    "/css/**",
+                    "/js/**",
+                    "/images/**",
+                    "/h2-console/**",
+                    "/error/**",
+                    "/courses",
+                    "/courses/**"
+                ).permitAll()
+
                 // Admin only
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 
@@ -42,9 +52,6 @@ public class SecurityConfig {
                 
                 // Student only
                 .requestMatchers("/student/**").hasRole("STUDENT")
-                
-                // User profile - all authenticated users
-                .requestMatchers("/user/**").authenticated()
                 
                 // All other requests require authentication
                 .anyRequest().authenticated()
