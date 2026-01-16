@@ -1,0 +1,87 @@
+@startuml Architecture
+
+title Course Enrollment System - Architecture
+
+package "Presentation Layer" {
+    [Thymeleaf Templates] as templates
+}
+
+package "Controller Layer" {
+    [AuthController] as authCtrl
+    [AdminController] as adminCtrl
+    [CourseController] as courseCtrl
+    [StudentController] as studentCtrl
+    [TeacherController] as teacherCtrl
+}
+
+package "Service Layer" {
+    [RegistrationService] as regService
+    [UserService] as userService
+    [EnrollmentService] as enrollService
+    [DbUserDetailsService] as authService
+}
+
+package "Repository Layer" {
+    [UserRepository] as userRepo
+    [CourseRepository] as courseRepo
+    [EnrollmentRepository] as enrollRepo
+    [ClassroomRepository] as classRepo
+    [RoleRepository] as roleRepo
+}
+
+package "Model Layer" {
+    [Account] as account
+    [Profile] as profile
+    [Course] as course
+    [Enrollment] as enrollment
+    [Classroom] as classroom
+    [Schedule] as schedule
+    [Role] as role
+}
+
+package "Security" {
+    [SecurityConfig] as security
+    [RoleBasedHandler] as roleHandler
+}
+
+database "Database" {
+    [PostgreSQL/MySQL] as db
+}
+
+' Relationships
+templates --> authCtrl
+templates --> adminCtrl
+templates --> courseCtrl
+templates --> studentCtrl
+templates --> teacherCtrl
+
+authCtrl --> regService
+authCtrl --> authService
+adminCtrl --> userService
+courseCtrl --> courseRepo
+studentCtrl --> enrollService
+teacherCtrl --> classRepo
+
+regService --> userRepo
+regService --> roleRepo
+userService --> userRepo
+enrollService --> enrollRepo
+enrollService --> courseRepo
+authService --> userRepo
+
+userRepo --> db
+courseRepo --> db
+enrollRepo --> db
+classRepo --> db
+roleRepo --> db
+
+userRepo ..> account
+courseRepo ..> course
+enrollRepo ..> enrollment
+classRepo ..> classroom
+roleRepo ..> role
+
+security --> authService
+security --> roleHandler
+
+@enduml

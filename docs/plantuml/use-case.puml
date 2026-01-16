@@ -1,0 +1,75 @@
+@startuml Use Cases
+
+left to right direction
+
+actor Guest
+actor Student
+actor Teacher
+actor Admin
+
+rectangle "Course Enrollment System" {
+    
+    ' Authentication
+    (Register Account) as register
+    (Login) as login
+    (Logout) as logout
+    
+    ' Student
+    (View Courses) as viewCourses
+    (Enroll in Course) as enroll
+    (View My Enrollments) as myEnroll
+    (Drop Course) as drop
+    (Update Profile) as profile
+    
+    ' Teacher
+    (View My Classrooms) as myClass
+    (Create Classroom) as createClass
+    (Manage Schedule) as schedule
+    (View Students) as viewStudents
+    
+    ' Admin
+    (Approve Users) as approveUser
+    (Manage Users) as manageUser
+    (Create Course) as createCourse
+    (Manage Courses) as manageCourse
+    (Approve Enrollments) as approveEnroll
+    (Assign Roles) as assignRole
+}
+
+' Guest
+Guest --> register
+Guest --> login
+Guest --> viewCourses
+
+' Student
+Student --> login
+Student --> logout
+Student --> viewCourses
+Student --> enroll
+Student --> myEnroll
+Student --> drop
+Student --> profile
+
+' Teacher
+Teacher --> login
+Teacher --> logout
+Teacher --> myClass
+Teacher --> createClass
+Teacher --> schedule
+Teacher --> viewStudents
+
+' Admin
+Admin --> login
+Admin --> logout
+Admin --> approveUser
+Admin --> manageUser
+Admin --> createCourse
+Admin --> manageCourse
+Admin --> approveEnroll
+Admin --> assignRole
+
+' Relationships
+enroll ..> viewCourses : <<includes>>
+drop ..> myEnroll : <<includes>>
+
+@enduml

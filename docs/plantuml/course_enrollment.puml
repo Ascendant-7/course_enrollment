@@ -1,0 +1,77 @@
+@startuml Course Enrollment System
+
+title Course Enrollment System - Entity Relationship
+
+class Account {
+    +id : Long
+    +username : String
+    +email : String
+    +passwordHash : String
+    +enabled : Boolean
+    +approved : Boolean
+}
+
+class Profile {
+    +account_id : Long
+    +firstName : String
+    +lastName : String
+    +phone : String
+}
+
+class Role {
+    +id : Integer
+    +name : String
+}
+
+class Course {
+    +id : Long
+    +code : String
+    +name : String
+    +credits : Integer
+    +capacity : Integer
+}
+
+class Enrollment {
+    +id : Long
+    +student_id : Long
+    +course_id : Long
+    +status : EnrollmentStatus
+}
+
+class Classroom {
+    +id : Long
+    +code : String
+    +teacher_id : Long
+    +course_id : Long
+    +startDate : LocalDate
+    +endDate : LocalDate
+}
+
+class Schedule {
+    +id : Long
+    +classroom_id : Long
+    +dayOfWeek : String
+    +startTime : LocalTime
+    +endTime : LocalTime
+}
+
+enum EnrollmentStatus {
+    PENDING
+    ENROLLED
+    REJECTED
+    WAITLISTED
+    PASSED
+    FAILED
+    DROPPED
+}
+
+Account "1" -- "1" Profile
+Account "0..*" -- "0..*" Role
+Account "1" -- "0..*" Enrollment : student
+Account "1" -- "0..*" Classroom : teacher
+Course "1" -- "0..*" Enrollment
+Course "1" -- "0..*" Classroom
+Classroom "1" *-- "0..*" Schedule
+Enrollment --> EnrollmentStatus
+
+@enduml

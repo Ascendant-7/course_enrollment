@@ -1,28 +1,57 @@
 @startuml classroom-assignment
+
+title Classroom Assignment Flow
+
 start
 
-:student enrolls into course;
-:check for classrooms teaching this course;
-if () then ([exist])
-    :check the newest classroom;
-    if () then ([available])
-        :assign student to classroom;
-        if () then ([capacity reach 50])
-            :create new classroom;
-            :assign teacher;
-            :transfer 10 students over to new classroom;
-        else
+:Student enrolls into course;
+
+note right
+    Initial enrollment request
+    Status: PENDING
+end note
+
+:Check for existing classrooms 
+teaching this course;
+
+if (Classrooms exist?) then (yes)
+    :Get the newest classroom;
+    
+    :Check classroom capacity;
+    
+    if (Has available space?) then (yes)
+        :Assign student to classroom;
+        
+        :Update enrollment status to ENROLLED;
+        
+        if (Classroom capacity = 50?) then (yes)
+            note right
+                Capacity threshold reached
+                Need to balance load
+            end note
+            
+            :Create new classroom;
+            :Assign available teacher;
+            :Transfer 10 students to new classroom;
+            
+        else (no)
+            ' Continue - capacity not reached
         endif
-    else
-        :create new classroom;
-        :assign teacher;
-        :assign student;
+        
+    else (no - full)
+        :Create new classroom;
+        :Assign available teacher;
+        :Assign student to new classroom;
+        :Update enrollment status to ENROLLED;
     endif
-else
-    :create new classroom;
-    :assign teacher;
-    :assign student;
+    
+else (no)
+    :Create new classroom;
+    :Assign available teacher;
+    :Assign student to new classroom;
+    :Update enrollment status to ENROLLED;
 endif
 
-end
+stop
+
 @enduml
