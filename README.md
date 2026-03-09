@@ -15,6 +15,14 @@
 - **FLYWAY-FIRST**
 - **SIGNING-RECOMMENDED**
 
+## Infrastructure & Automation
+
+This project uses (or plans to use) Ansible for server provisioning, application deployment, and database
+migration automation.
+
+📄 See [docs/ansible.md](docs/ansible.md) for a beginner-friendly introduction to Ansible and how it applies
+to this repository.
+
 ## Project Requirements
 
 Our project uses the **Spring Boot Framework** as the foundation.
